@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXUS | شهر مخفی</title>
+
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #0b0f18;
+    color: white;
+}
+
+.container {
+    max-width: 500px;
+    margin: auto;
+    padding: 20px;
+}
+
+.header {
+    text-align: center;
+    padding: 20px 0;
+}
+
+.logo {
+    font-size: 42px;
+    font-weight: bold;
+    letter-spacing: 4px;
+}
+
+.subtitle {
+    color: #8f9bad;
+    margin-top: 8px;
+}
+
+.card {
+    background: #151c29;
+    border-radius: 20px;
+    padding: 20px;
+    margin-bottom: 15px;
+}
+
+.balance {
+    text-align: center;
+}
+
+.balance-number {
+    font-size: 38px;
+    font-weight: bold;
+    margin: 10px 0;
+}
+
+.stats {
+    display: flex;
+    justify-content: space-around;
+    text-align: center;
+}
+
+.stat-title {
+    color: #8994a6;
+    font-size: 13px;
+}
+
+.stat-value {
+    font-size: 20px;
+    margin-top: 5px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+button {
+    width: 100%;
+    border: none;
+    border-radius: 15px;
+    padding: 18px 10px;
+    background: #202a3a;
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:active {
+    transform: scale(0.97);
+}
+
+.mission {
+    background: #111925;
+    border-radius: 15px;
+    padding: 15px;
+    margin-top: 12px;
+}
+
+.reward {
+    color: #ffd54a;
+    font-weight: bold;
+}
+
+.progress {
+    height: 8px;
+    background: #293344;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-top: 12px;
+}
+
+.progress-bar {
+    width: 20%;
+    height: 100%;
+    background: #ffd54a;
+}
+
+.footer {
+    text-align: center;
+    color: #667386;
+    font-size: 12px;
+    margin-top: 25px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <div class="logo">NEXUS</div>
+        <div class="subtitle">شهر مخفی</div>
+    </div>
+
+    <div class="card balance">
+        <div>موجودی شما</div>
+        <div class="balance-number">
+            💰 <span id="coins">1000</span> NEX
+        </div>
+
+        <div class="stats">
+            <div>
+                <div class="stat-title">سطح</div>
+                <div class="stat-value">⭐ 1</div>
+            </div>
+
+            <div>
+                <div class="stat-title">اعتبار</div>
+                <div class="stat-value">0</div>
+            </div>
+
+            <div>
+                <div class="stat-title">روز متوالی</div>
+                <div class="stat-value">🔥 0</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>🎯 مأموریت امروز</h3>
+
+        <div class="mission">
+            <strong>اولین قدم</strong>
+
+            <p>
+                وارد شهر شو و اولین مأموریت خودت را کامل کن.
+            </p>
+
+            <div class="reward">
+                🎁 پاداش: +100 NEX
+            </div>
+
+            <button onclick="completeMission()" style="margin-top:12px;">
+                انجام مأموریت
+            </button>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="grid">
+
+            <button onclick="alert('🏙️ شهر شما به‌زودی باز می‌شود')">
+                🏠<br>شهر من
+            </button>
+
+            <button onclick="alert('💰 بازار به‌زودی باز می‌شود')">
+                💰<br>بازار
+            </button>
+
+            <button onclick="alert('🕵️ عملیات به‌زودی باز می‌شود')">
+                🕵️<br>عملیات
+            </button>
+
+            <button onclick="alert('🏆 رتبه‌بندی به‌زودی باز می‌شود')">
+                🏆<br>رتبه‌بندی
+            </button>
+
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>👥 دعوت دوستان</h3>
+
+        <p>
+            دوستانت را به NEXUS دعوت کن و NEX بیشتری بگیر.
+        </p>
+
+        <button onclick="inviteFriend()">
+            🔗 دعوت دوستان
+        </button>
+    </div>
+
+    <div class="card">
+        <strong>⭐ پیشرفت شهروند</strong>
+
+        <div class="progress">
+            <div class="progress-bar"></div>
+        </div>
+
+        <p style="color:#8994a6;">
+            سطح 1 → سطح 2
+        </p>
+    </div>
+
+    <div class="footer">
+        NEXUS © 2026
+    </div>
+
+</div>
+
+<script>
+
+let coins = 1000;
+let missionCompleted = false;
+
+function completeMission() {
+
+    if (missionCompleted) {
+        alert("این مأموریت قبلاً انجام شده است.");
+        return;
+    }
+
+    coins += 100;
+
+    document.getElementById("coins").innerText = coins;
+
+    missionCompleted = true;
+
+    alert("🎉 مأموریت انجام شد!\n\n+100 NEX به حساب شما اضافه شد.");
+}
+
+function inviteFriend() {
+
+    alert(
+        "👥 سیستم دعوت دوستان به‌زودی فعال می‌شود.\n\n" +
+        "لینک اختصاصی دعوت شما اینجا قرار خواهد گرفت."
+    );
+
+}
+
+</script>
+
+</body>
+</html>
