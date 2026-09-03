@@ -14,12 +14,29 @@ if (tg) {
 
 const state = {
   language: localStorage.getItem("nexus_language") || null,
+
   nex: Number(localStorage.getItem("nexus_nex") || 10000),
-  energy: Number(localStorage.getItem("nexus_energy") || 100),
-  xp: Number(localStorage.getItem("nexus_xp") || 0),
-  level: Number(localStorage.getItem("nexus_level") || 1),
-  cityValue: Number(localStorage.getItem("nexus_city_value") || 1000),
-  cityLevel: Number(localStorage.getItem("nexus_city_level") || 1),
+
+  energy: Number(
+    localStorage.getItem("nexus_energy") || 100
+  ),
+
+  xp: Number(
+    localStorage.getItem("nexus_xp") || 0
+  ),
+
+  level: Number(
+    localStorage.getItem("nexus_level") || 1
+  ),
+
+  cityValue: Number(
+    localStorage.getItem("nexus_city_value") || 1000
+  ),
+
+  cityLevel: Number(
+    localStorage.getItem("nexus_city_level") || 1
+  ),
+
   selectedBuilding: null
 };
 
@@ -28,9 +45,12 @@ const state = {
 ========================= */
 
 const translations = {
+
   fa: {
+
     title: "NEXUS",
     subtitle: "شهر مخفی",
+
     chooseLanguage: "زبان را انتخاب کنید",
     persian: "فارسی",
     english: "English",
@@ -53,31 +73,86 @@ const translations = {
     profile: "پروفایل",
 
     move: "حرکت",
-    interact: "تعامل",
+    interact: "ورود",
     close: "بستن",
 
     welcome: "به شهر مخفی خوش آمدی",
-    welcomeText: "شهر را کاوش کن، ساختمان‌ها را فعال کن و NEX به دست بیاور.",
 
-    hqText: "مرکز اصلی مدیریت شهر.",
-    bankText: "مدیریت سرمایه و درآمد شهر.",
-    intelligenceText: "اطلاعات، مأموریت‌ها و عملیات ویژه.",
-    marketText: "خرید تجهیزات و آیتم‌های شهری.",
+    welcomeText:
+      "شهر را کاوش کن، ساختمان‌ها را فعال کن و NEX به دست بیاور.",
 
-    comingSoon: "این بخش به‌زودی فعال می‌شود.",
-    energyEmpty: "انرژی کافی نیست.",
-    operationReward: "عملیات با موفقیت انجام شد!",
-    operationCost: "هزینه عملیات",
+    hqText:
+      "مرکز اصلی مدیریت شهر و آغاز عملیات.",
 
-    daily: "پاداش روزانه",
-    dailyText: "پاداش روزانه آماده دریافت است.",
+    bankText:
+      "مدیریت سرمایه، سپرده‌ها و درآمد شهر.",
 
-    save: "ذخیره"
+    intelligenceText:
+      "مرکز اطلاعات، مأموریت‌ها و عملیات ویژه.",
+
+    marketText:
+      "خرید تجهیزات و آیتم‌های مورد نیاز شهر.",
+
+    enterBuilding:
+      "ورود به ساختمان",
+
+    buildingOperations:
+      "عملیات موجود",
+
+    operationOne:
+      "عملیات شناسایی",
+
+    operationOneText:
+      "یک مأموریت کم‌ریسک برای افزایش XP و درآمد.",
+
+    cost:
+      "هزینه",
+
+    reward:
+      "پاداش",
+
+    risk:
+      "ریسک",
+
+    low:
+      "کم",
+
+    medium:
+      "متوسط",
+
+    high:
+      "زیاد",
+
+    execute:
+      "اجرای عملیات",
+
+    comingSoon:
+      "این بخش در مرحله بعدی توسعه فعال می‌شود.",
+
+    energyEmpty:
+      "انرژی کافی نیست.",
+
+    nexEmpty:
+      "NEX کافی نیست.",
+
+    operationSuccess:
+      "عملیات با موفقیت انجام شد.",
+
+    operationFailed:
+      "عملیات شکست خورد.",
+
+    daily:
+      "پاداش روزانه",
+
+    dailyText:
+      "پاداش روزانه آماده دریافت است."
   },
 
   en: {
+
     title: "NEXUS",
     subtitle: "Secret City",
+
     chooseLanguage: "Choose your language",
     persian: "فارسی",
     english: "English",
@@ -100,26 +175,79 @@ const translations = {
     profile: "Profile",
 
     move: "Move",
-    interact: "Interact",
+    interact: "Enter",
     close: "Close",
 
     welcome: "Welcome to the Secret City",
-    welcomeText: "Explore the city, activate buildings and earn NEX.",
 
-    hqText: "The main management center of the city.",
-    bankText: "Manage city capital and income.",
-    intelligenceText: "Information, missions and special operations.",
-    marketText: "Buy equipment and city items.",
+    welcomeText:
+      "Explore the city, activate buildings and earn NEX.",
 
-    comingSoon: "This section is coming soon.",
-    energyEmpty: "Not enough energy.",
-    operationReward: "Operation completed successfully!",
-    operationCost: "Operation cost",
+    hqText:
+      "The main city management center and operation hub.",
 
-    daily: "Daily Reward",
-    dailyText: "Your daily reward is ready to claim.",
+    bankText:
+      "Manage capital, deposits and city income.",
 
-    save: "Save"
+    intelligenceText:
+      "Information, missions and special operations.",
+
+    marketText:
+      "Purchase equipment and useful city items.",
+
+    enterBuilding:
+      "Enter Building",
+
+    buildingOperations:
+      "Available Operations",
+
+    operationOne:
+      "Recon Operation",
+
+    operationOneText:
+      "A low-risk operation for earning XP and income.",
+
+    cost:
+      "Cost",
+
+    reward:
+      "Reward",
+
+    risk:
+      "Risk",
+
+    low:
+      "Low",
+
+    medium:
+      "Medium",
+
+    high:
+      "High",
+
+    execute:
+      "Execute Operation",
+
+    comingSoon:
+      "This section will be activated in the next development stage.",
+
+    energyEmpty:
+      "Not enough energy.",
+
+    nexEmpty:
+      "Not enough NEX.",
+
+    operationSuccess:
+      "Operation completed successfully.",
+
+    operationFailed:
+      "Operation failed.",
+
+    daily:
+      "Daily Reward",
+
+    dailyText:
+      "Your daily reward is ready."
   }
 };
 
@@ -127,23 +255,58 @@ const translations = {
    HELPERS
 ========================= */
 
+function $(id) {
+  return document.getElementById(id);
+}
+
 function t(key) {
-  const lang = state.language || "fa";
-  return translations[lang]?.[key] || key;
+
+  const lang =
+    state.language || "fa";
+
+  return (
+    translations[lang]?.[key] ||
+    translations.fa[key] ||
+    key
+  );
 }
 
 function saveState() {
-  localStorage.setItem("nexus_language", state.language || "fa");
-  localStorage.setItem("nexus_nex", state.nex);
-  localStorage.setItem("nexus_energy", state.energy);
-  localStorage.setItem("nexus_xp", state.xp);
-  localStorage.setItem("nexus_level", state.level);
-  localStorage.setItem("nexus_city_value", state.cityValue);
-  localStorage.setItem("nexus_city_level", state.cityLevel);
-}
 
-function $(id) {
-  return document.getElementById(id);
+  localStorage.setItem(
+    "nexus_language",
+    state.language || "fa"
+  );
+
+  localStorage.setItem(
+    "nexus_nex",
+    state.nex
+  );
+
+  localStorage.setItem(
+    "nexus_energy",
+    state.energy
+  );
+
+  localStorage.setItem(
+    "nexus_xp",
+    state.xp
+  );
+
+  localStorage.setItem(
+    "nexus_level",
+    state.level
+  );
+
+  localStorage.setItem(
+    "nexus_city_value",
+    state.cityValue
+  );
+
+  localStorage.setItem(
+    "nexus_city_level",
+    state.cityLevel
+  );
 }
 
 /* =========================
@@ -151,36 +314,48 @@ function $(id) {
 ========================= */
 
 function setLanguage(lang) {
+
   state.language = lang;
+
   saveState();
 
-  document.documentElement.lang = lang;
-  document.documentElement.dir = lang === "fa" ? "rtl" : "ltr";
+  document.documentElement.lang =
+    lang;
+
+  document.documentElement.dir =
+    lang === "fa"
+      ? "rtl"
+      : "ltr";
 
   updateInterface();
 
-  const languageScreen = $("language-screen");
+  const screen =
+    $("language-screen");
 
-  if (languageScreen) {
-    languageScreen.classList.add("hidden");
-  }
-
-  const loading = $("loading");
-
-  if (loading) {
-    setTimeout(() => {
-      loading.classList.add("hidden");
-    }, 300);
+  if (screen) {
+    screen.classList.add("hidden");
   }
 }
 
-function updateInterface() {
-  const elements = document.querySelectorAll("[data-i18n]");
+window.NEXUS_setLanguage =
+  setLanguage;
 
-  elements.forEach((element) => {
-    const key = element.dataset.i18n;
-    element.textContent = t(key);
-  });
+/* =========================
+   INTERFACE
+========================= */
+
+function updateInterface() {
+
+  document
+    .querySelectorAll("[data-i18n]")
+    .forEach((element) => {
+
+      const key =
+        element.dataset.i18n;
+
+      element.textContent =
+        t(key);
+    });
 
   updateHUD();
 }
@@ -190,21 +365,50 @@ function updateInterface() {
 ========================= */
 
 function updateHUD() {
-  const nex = $("nex-value");
-  const energy = $("energy-value");
-  const level = $("level-value");
-  const xp = $("xp-value");
-  const cityValue = $("city-value");
 
-  if (nex) nex.textContent = state.nex.toLocaleString();
-  if (energy) energy.textContent = state.energy;
-  if (level) level.textContent = state.level;
-  if (xp) xp.textContent = state.xp;
-  if (cityValue) cityValue.textContent = state.cityValue.toLocaleString();
+  const nex =
+    $("nex-value");
+
+  const energy =
+    $("energy-value");
+
+  const level =
+    $("level-value");
+
+  const xp =
+    $("xp-value");
+
+  const city =
+    $("city-value");
+
+  if (nex) {
+    nex.textContent =
+      state.nex.toLocaleString();
+  }
+
+  if (energy) {
+    energy.textContent =
+      state.energy;
+  }
+
+  if (level) {
+    level.textContent =
+      state.level;
+  }
+
+  if (xp) {
+    xp.textContent =
+      state.xp;
+  }
+
+  if (city) {
+    city.textContent =
+      state.cityValue.toLocaleString();
+  }
 }
 
 /* =========================
-   THREE.JS SCENE
+   THREE.JS
 ========================= */
 
 let scene;
@@ -215,87 +419,164 @@ let player;
 
 const buildings = [];
 
+/* =========================
+   INIT
+========================= */
+
 function init3D() {
-  const container = $("game-container");
 
-  if (!container) return;
+  const container =
+    $("game-container");
 
-  scene = new THREE.Scene();
+  if (!container) {
+    return;
+  }
 
-  scene.background = new THREE.Color(0x05070d);
-  scene.fog = new THREE.Fog(0x05070d, 25, 90);
+  scene =
+    new THREE.Scene();
 
-  camera = new THREE.PerspectiveCamera(
-    60,
-    window.innerWidth / window.innerHeight,
-    0.1,
-    200
+  scene.background =
+    new THREE.Color(0x05070d);
+
+  scene.fog =
+    new THREE.Fog(
+      0x05070d,
+      25,
+      90
+    );
+
+  camera =
+    new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth /
+        window.innerHeight,
+      0.1,
+      200
+    );
+
+  camera.position.set(
+    12,
+    11,
+    15
   );
 
-  camera.position.set(10, 10, 14);
+  renderer =
+    new THREE.WebGLRenderer({
+      antialias: true
+    });
 
-  renderer = new THREE.WebGLRenderer({
-    antialias: true,
-    alpha: false
-  });
-
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setPixelRatio(
+    Math.min(
+      window.devicePixelRatio,
+      2
+    )
+  );
 
   renderer.setSize(
-    container.clientWidth || window.innerWidth,
-    container.clientHeight || window.innerHeight
+    container.clientWidth ||
+      window.innerWidth,
+
+    container.clientHeight ||
+      window.innerHeight
   );
 
-  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.enabled =
+    true;
 
   container.innerHTML = "";
-  container.appendChild(renderer.domElement);
 
-  controls = new OrbitControls(camera, renderer.domElement);
+  container.appendChild(
+    renderer.domElement
+  );
 
-  controls.enableDamping = true;
-  controls.enablePan = false;
+  controls =
+    new OrbitControls(
+      camera,
+      renderer.domElement
+    );
 
-  controls.minDistance = 6;
-  controls.maxDistance = 30;
+  controls.enableDamping =
+    true;
 
-  controls.maxPolarAngle = Math.PI / 2.05;
+  controls.enablePan =
+    false;
+
+  controls.minDistance =
+    6;
+
+  controls.maxDistance =
+    35;
+
+  controls.maxPolarAngle =
+    Math.PI / 2.05;
 
   /* LIGHT */
 
-  const ambient = new THREE.AmbientLight(0x8899bb, 1.3);
+  const ambient =
+    new THREE.AmbientLight(
+      0x8fa3c5,
+      1.5
+    );
+
   scene.add(ambient);
 
-  const moonLight = new THREE.DirectionalLight(0xaabbff, 2);
-  moonLight.position.set(-15, 25, 10);
-  moonLight.castShadow = true;
+  const moon =
+    new THREE.DirectionalLight(
+      0xa9bbff,
+      2.5
+    );
 
-  scene.add(moonLight);
+  moon.position.set(
+    -20,
+    30,
+    15
+  );
+
+  moon.castShadow =
+    true;
+
+  scene.add(moon);
 
   /* GROUND */
 
-  const groundGeometry = new THREE.PlaneGeometry(100, 100);
+  const ground =
+    new THREE.Mesh(
 
-  const groundMaterial = new THREE.MeshStandardMaterial({
-    color: 0x10151d,
-    roughness: 0.9,
-    metalness: 0.1
-  });
+      new THREE.PlaneGeometry(
+        100,
+        100
+      ),
 
-  const ground = new THREE.Mesh(
-    groundGeometry,
-    groundMaterial
-  );
+      new THREE.MeshStandardMaterial({
+        color: 0x10151d,
+        roughness: 0.9
+      })
 
-  ground.rotation.x = -Math.PI / 2;
-  ground.receiveShadow = true;
+    );
+
+  ground.rotation.x =
+    -Math.PI / 2;
+
+  ground.receiveShadow =
+    true;
 
   scene.add(ground);
 
   /* ROADS */
 
-  createRoad(0, 0, 5, 100);
-  createRoad(0, 0, 100, 5);
+  createRoad(
+    0,
+    0,
+    5,
+    100
+  );
+
+  createRoad(
+    0,
+    0,
+    100,
+    5
+  );
 
   /* BUILDINGS */
 
@@ -335,11 +616,12 @@ function init3D() {
     0x6a4825
   );
 
-  /* PLAYER */
-
   createPlayer();
 
-  window.addEventListener("resize", resize3D);
+  window.addEventListener(
+    "resize",
+    resize3D
+  );
 
   renderer.domElement.addEventListener(
     "pointerdown",
@@ -349,27 +631,45 @@ function init3D() {
   animate();
 }
 
-function createRoad(x, z, width, depth) {
-  const geometry = new THREE.BoxGeometry(
-    width,
-    0.05,
-    depth
+/* =========================
+   ROAD
+========================= */
+
+function createRoad(
+  x,
+  z,
+  width,
+  depth
+) {
+
+  const road =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        width,
+        0.05,
+        depth
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0x181c22,
+        roughness: 1
+      })
+
+    );
+
+  road.position.set(
+    x,
+    0.025,
+    z
   );
-
-  const material = new THREE.MeshStandardMaterial({
-    color: 0x181c22,
-    roughness: 1
-  });
-
-  const road = new THREE.Mesh(
-    geometry,
-    material
-  );
-
-  road.position.set(x, 0.025, z);
 
   scene.add(road);
 }
+
+/* =========================
+   BUILDING
+========================= */
 
 function createBuilding(
   type,
@@ -379,22 +679,23 @@ function createBuilding(
   height,
   color
 ) {
-  const geometry = new THREE.BoxGeometry(
-    width,
-    height,
-    width
-  );
 
-  const material = new THREE.MeshStandardMaterial({
-    color,
-    roughness: 0.55,
-    metalness: 0.25
-  });
+  const building =
+    new THREE.Mesh(
 
-  const building = new THREE.Mesh(
-    geometry,
-    material
-  );
+      new THREE.BoxGeometry(
+        width,
+        height,
+        width
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color,
+        roughness: 0.55,
+        metalness: 0.25
+      })
+
+    );
 
   building.position.set(
     x,
@@ -402,10 +703,16 @@ function createBuilding(
     z
   );
 
-  building.castShadow = true;
-  building.receiveShadow = true;
+  building.castShadow =
+    true;
 
-  building.userData.type = type;
+  building.receiveShadow =
+    true;
+
+  building.userData = {
+    type,
+    interactive: true
+  };
 
   scene.add(building);
 
@@ -413,21 +720,21 @@ function createBuilding(
 
   /* ROOF */
 
-  const roofGeometry = new THREE.BoxGeometry(
-    width + 0.4,
-    0.3,
-    width + 0.4
-  );
+  const roof =
+    new THREE.Mesh(
 
-  const roofMaterial = new THREE.MeshStandardMaterial({
-    color: 0x080b11,
-    metalness: 0.5
-  });
+      new THREE.BoxGeometry(
+        width + 0.4,
+        0.3,
+        width + 0.4
+      ),
 
-  const roof = new THREE.Mesh(
-    roofGeometry,
-    roofMaterial
-  );
+      new THREE.MeshStandardMaterial({
+        color: 0x080b11,
+        metalness: 0.5
+      })
+
+    );
 
   roof.position.set(
     x,
@@ -435,7 +742,10 @@ function createBuilding(
     z
   );
 
-  roof.userData.type = type;
+  roof.userData = {
+    type,
+    interactive: true
+  };
 
   scene.add(roof);
 
@@ -443,123 +753,201 @@ function createBuilding(
 
   /* WINDOWS */
 
-  for (let y = 1.5; y < height - 0.5; y += 1.5) {
-    createWindow(x, y, z - width / 2 - 0.03);
-    createWindow(x, y, z + width / 2 + 0.03);
+  for (
+    let y = 1.5;
+    y < height - 0.5;
+    y += 1.5
+  ) {
+
+    createWindow(
+      x,
+      y,
+      z - width / 2 - 0.04
+    );
+
+    createWindow(
+      x,
+      y,
+      z + width / 2 + 0.04
+    );
   }
 }
 
-function createWindow(x, y, z) {
-  const geometry = new THREE.BoxGeometry(
-    0.65,
-    0.55,
-    0.08
+function createWindow(
+  x,
+  y,
+  z
+) {
+
+  const windowMesh =
+    new THREE.Mesh(
+
+      new THREE.BoxGeometry(
+        0.65,
+        0.55,
+        0.08
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0xd9c77a,
+        emissive: 0x4b3f14,
+        emissiveIntensity: 0.8
+      })
+
+    );
+
+  windowMesh.position.set(
+    x,
+    y,
+    z
   );
-
-  const material = new THREE.MeshStandardMaterial({
-    color: 0xd9c77a,
-    emissive: 0x4b3f14,
-    emissiveIntensity: 0.8
-  });
-
-  const windowMesh = new THREE.Mesh(
-    geometry,
-    material
-  );
-
-  windowMesh.position.set(x, y, z);
 
   scene.add(windowMesh);
 }
 
+/* =========================
+   PLAYER
+========================= */
+
 function createPlayer() {
-  const group = new THREE.Group();
 
-  const bodyGeometry = new THREE.CapsuleGeometry(
-    0.45,
-    0.8,
-    6,
-    12
+  player =
+    new THREE.Group();
+
+  const body =
+    new THREE.Mesh(
+
+      new THREE.CapsuleGeometry(
+        0.45,
+        0.8,
+        6,
+        12
+      ),
+
+      new THREE.MeshStandardMaterial({
+        color: 0xeeeeee,
+        roughness: 0.4
+      })
+
+    );
+
+  body.castShadow =
+    true;
+
+  player.add(body);
+
+  const light =
+    new THREE.PointLight(
+      0x7ab8ff,
+      2,
+      8
+    );
+
+  light.position.y =
+    1.5;
+
+  player.add(light);
+
+  player.position.set(
+    0,
+    0.9,
+    0
   );
 
-  const bodyMaterial = new THREE.MeshStandardMaterial({
-    color: 0xeeeeee,
-    roughness: 0.4
-  });
-
-  const body = new THREE.Mesh(
-    bodyGeometry,
-    bodyMaterial
-  );
-
-  body.castShadow = true;
-
-  group.add(body);
-
-  const light = new THREE.PointLight(
-    0x7ab8ff,
-    2,
-    8
-  );
-
-  light.position.y = 1.5;
-
-  group.add(light);
-
-  group.position.set(0, 0.9, 0);
-
-  scene.add(group);
-
-  player = group;
-}
-
-function resize3D() {
-  if (!renderer || !camera) return;
-
-  const container = $("game-container");
-
-  const width =
-    container?.clientWidth || window.innerWidth;
-
-  const height =
-    container?.clientHeight || window.innerHeight;
-
-  camera.aspect = width / height;
-  camera.updateProjectionMatrix();
-
-  renderer.setSize(width, height);
+  scene.add(player);
 }
 
 /* =========================
-   BUILDING INTERACTION
+   RESIZE
 ========================= */
 
-function handleSceneClick(event) {
-  if (!camera || !renderer) return;
+function resize3D() {
+
+  if (
+    !renderer ||
+    !camera
+  ) {
+    return;
+  }
+
+  const container =
+    $("game-container");
+
+  const width =
+    container?.clientWidth ||
+    window.innerWidth;
+
+  const height =
+    container?.clientHeight ||
+    window.innerHeight;
+
+  camera.aspect =
+    width / height;
+
+  camera.updateProjectionMatrix();
+
+  renderer.setSize(
+    width,
+    height
+  );
+}
+
+/* =========================
+   BUILDING CLICK
+========================= */
+
+function handleSceneClick(
+  event
+) {
+
+  if (
+    !camera ||
+    !renderer
+  ) {
+    return;
+  }
 
   const rect =
-    renderer.domElement.getBoundingClientRect();
+    renderer.domElement
+      .getBoundingClientRect();
 
-  const mouse = new THREE.Vector2();
+  const mouse =
+    new THREE.Vector2();
 
   mouse.x =
-    ((event.clientX - rect.left) / rect.width) * 2 - 1;
+    (
+      (event.clientX -
+        rect.left) /
+      rect.width
+    ) * 2 - 1;
 
   mouse.y =
-    -((event.clientY - rect.top) / rect.height) * 2 + 1;
+    -(
+      (event.clientY -
+        rect.top) /
+      rect.height
+    ) * 2 + 1;
 
-  const raycaster = new THREE.Raycaster();
+  const raycaster =
+    new THREE.Raycaster();
 
-  raycaster.setFromCamera(mouse, camera);
-
-  const hits = raycaster.intersectObjects(
-    buildings,
-    false
+  raycaster.setFromCamera(
+    mouse,
+    camera
   );
 
-  if (!hits.length) return;
+  const hits =
+    raycaster.intersectObjects(
+      buildings,
+      false
+    );
 
-  const type = hits[0].object.userData.type;
+  if (!hits.length) {
+    return;
+  }
+
+  const type =
+    hits[0].object.userData.type;
 
   if (type) {
     openBuilding(type);
@@ -567,164 +955,450 @@ function handleSceneClick(event) {
 }
 
 /* =========================
-   BUILDING PANEL
+   BUILDING ENTRY
 ========================= */
 
-function openBuilding(type) {
-  state.selectedBuilding = type;
+function openBuilding(
+  type
+) {
 
-  const title = $( "panel-title" );
-  const text = $( "panel-text" );
-  const panel = $( "action-panel" );
+  state.selectedBuilding =
+    type;
 
-  if (!panel) return;
+  const title =
+    $("panel-title");
 
-  const titleMap = {
+  const text =
+    $("panel-text");
+
+  const panel =
+    $("action-panel");
+
+  if (!panel) {
+    return;
+  }
+
+  const titleKey = {
+
     hq: "hq",
     bank: "bank",
     intelligence: "intelligence",
     market: "market"
-  };
 
-  const textMap = {
+  }[type];
+
+  const textKey = {
+
     hq: "hqText",
     bank: "bankText",
     intelligence: "intelligenceText",
     market: "marketText"
-  };
+
+  }[type];
 
   if (title) {
-    title.textContent = t(titleMap[type]);
+    title.textContent =
+      t(titleKey);
   }
 
   if (text) {
-    text.textContent = t(textMap[type]);
+    text.textContent =
+      t(textKey);
   }
 
-  panel.classList.remove("hidden");
+  panel.classList.remove(
+    "hidden"
+  );
+
+  updateBuildingAction(
+    type
+  );
 }
 
 /* =========================
-   MOVEMENT
+   BUILDING ACTION
 ========================= */
 
-function movePlayer(dx, dz) {
-  if (!player) return;
+function updateBuildingAction(
+  type
+) {
 
-  const speed = 0.6;
+  const operationButton =
+    $("operation-button");
 
-  player.position.x += dx * speed;
-  player.position.z += dz * speed;
-
-  player.position.x = THREE.MathUtils.clamp(
-    player.position.x,
-    -18,
-    18
-  );
-
-  player.position.z = THREE.MathUtils.clamp(
-    player.position.z,
-    -18,
-    18
-  );
-
-  state.energy = Math.max(
-    0,
-    state.energy - 1
-  );
-
-  saveState();
-  updateHUD();
-}
-
-function setupMovement() {
-  const buttons = {
-    up: [0, -1],
-    down: [0, 1],
-    left: [-1, 0],
-    right: [1, 0]
-  };
-
-  Object.entries(buttons).forEach(
-    ([id, direction]) => {
-      const button = $(`move-${id}`);
-
-      if (!button) return;
-
-      button.addEventListener("click", () => {
-        movePlayer(
-          direction[0],
-          direction[1]
-        );
-      });
-    }
-  );
-
-  window.addEventListener("keydown", (event) => {
-    if (event.key === "ArrowUp" || event.key === "w") {
-      movePlayer(0, -1);
-    }
-
-    if (event.key === "ArrowDown" || event.key === "s") {
-      movePlayer(0, 1);
-    }
-
-    if (event.key === "ArrowLeft" || event.key === "a") {
-      movePlayer(-1, 0);
-    }
-
-    if (event.key === "ArrowRight" || event.key === "d") {
-      movePlayer(1, 0);
-    }
-  });
-}
-
-/* =========================
-   GAME ACTIONS
-========================= */
-
-function performOperation() {
-  const cost = 500;
-  const reward = 1500;
-  const xpReward = 50;
-
-  if (state.energy < 10) {
-    showMessage(t("energyEmpty"));
+  if (!operationButton) {
     return;
   }
 
-  if (state.nex < cost) {
+  if (type === "hq") {
+
+    operationButton.innerHTML =
+      `⚡ ${t("operations")}`;
+
+    operationButton.onclick =
+      showOperations;
+
+    return;
+  }
+
+  if (type === "intelligence") {
+
+    operationButton.innerHTML =
+      `🎯 ${t("missions")}`;
+
+    operationButton.onclick =
+      showMissions;
+
+    return;
+  }
+
+  if (type === "bank") {
+
+    operationButton.innerHTML =
+      `🏦 ${t("bank")}`;
+
+    operationButton.onclick =
+      showBank;
+
+    return;
+  }
+
+  if (type === "market") {
+
+    operationButton.innerHTML =
+      `🏪 ${t("marketNav")}`;
+
+    operationButton.onclick =
+      showMarket;
+
+    return;
+  }
+}
+
+/* =========================
+   OPERATIONS
+========================= */
+
+function showOperations() {
+
+  const modal =
+    $("modal");
+
+  const title =
+    $("modal-title");
+
+  const text =
+    $("modal-text");
+
+  if (!modal) {
+    return;
+  }
+
+  if (title) {
+    title.textContent =
+      t("buildingOperations");
+  }
+
+  if (text) {
+
+    text.innerHTML = `
+
+      <strong>
+        ${t("operationOne")}
+      </strong>
+
+      <br><br>
+
+      ${t("operationOneText")}
+
+      <br><br>
+
+      ${t("cost")}: 500 NEX
+
+      <br>
+
+      ${t("reward")}: 1,500 NEX + 50 XP
+
+      <br>
+
+      ${t("risk")}: ${t("low")}
+
+      <br><br>
+
+      <button
+        id="execute-operation"
+        style="
+          width:100%;
+          padding:12px;
+          border:0;
+          border-radius:12px;
+          font-weight:800;
+          cursor:pointer;
+        "
+      >
+        ⚡ ${t("execute")}
+      </button>
+
+    `;
+
+    setTimeout(() => {
+
+      const button =
+        $("execute-operation");
+
+      if (button) {
+
+        button.onclick =
+          performOperation;
+
+      }
+
+    }, 0);
+  }
+
+  modal.classList.remove(
+    "hidden"
+  );
+}
+
+/* =========================
+   OPERATION RESULT
+========================= */
+
+function performOperation() {
+
+  const cost =
+    500;
+
+  const reward =
+    1500;
+
+  const xpReward =
+    50;
+
+  if (
+    state.energy < 10
+  ) {
+
     showMessage(
-      `${t("operationCost")}: ${cost.toLocaleString()} NEX`
+      t("energyEmpty")
+    );
+
+    return;
+  }
+
+  if (
+    state.nex < cost
+  ) {
+
+    showMessage(
+      t("nexEmpty")
     );
 
     return;
   }
 
   state.nex -= cost;
-  state.nex += reward;
 
   state.energy -= 10;
-  state.xp += xpReward;
-  state.cityValue += 100;
 
-  checkLevel();
+  const success =
+    Math.random() < 0.85;
 
-  saveState();
-  updateHUD();
+  if (success) {
 
-  showMessage(t("operationReward"));
+    state.nex += reward;
+
+    state.xp += xpReward;
+
+    state.cityValue +=
+      100;
+
+    checkLevel();
+
+    saveState();
+
+    updateHUD();
+
+    showMessage(
+      t("operationSuccess")
+    );
+
+  } else {
+
+    state.xp += 10;
+
+    checkLevel();
+
+    saveState();
+
+    updateHUD();
+
+    showMessage(
+      t("operationFailed")
+    );
+  }
 }
 
-function checkLevel() {
-  const requiredXP =
-    state.level * 500;
+/* =========================
+   OTHER BUILDINGS
+========================= */
 
-  if (state.xp >= requiredXP) {
-    state.xp -= requiredXP;
-    state.level += 1;
-    state.cityLevel += 1;
+function showMissions() {
+
+  showMessage(
+    `${t("missions")}\n\n${t("comingSoon")}`
+  );
+}
+
+function showBank() {
+
+  showMessage(
+    `${t("bank")}\n\n${t("comingSoon")}`
+  );
+}
+
+function showMarket() {
+
+  showMessage(
+    `${t("marketNav")}\n\n${t("comingSoon")}`
+  );
+}
+
+/* =========================
+   MOVEMENT
+========================= */
+
+function movePlayer(
+  dx,
+  dz
+) {
+
+  if (!player) {
+    return;
   }
+
+  if (state.energy <= 0) {
+
+    showMessage(
+      t("energyEmpty")
+    );
+
+    return;
+  }
+
+  const speed =
+    0.6;
+
+  player.position.x +=
+    dx * speed;
+
+  player.position.z +=
+    dz * speed;
+
+  player.position.x =
+    THREE.MathUtils.clamp(
+      player.position.x,
+      -18,
+      18
+    );
+
+  player.position.z =
+    THREE.MathUtils.clamp(
+      player.position.z,
+      -18,
+      18
+    );
+
+  state.energy =
+    Math.max(
+      0,
+      state.energy - 1
+    );
+
+  saveState();
+
+  updateHUD();
+}
+
+function setupMovement() {
+
+  const directions = {
+
+    up: [0, -1],
+
+    down: [0, 1],
+
+    left: [-1, 0],
+
+    right: [1, 0]
+
+  };
+
+  Object.entries(
+    directions
+  ).forEach(
+    ([id, direction]) => {
+
+      const button =
+        $(`move-${id}`);
+
+      if (!button) {
+        return;
+      }
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          movePlayer(
+            direction[0],
+            direction[1]
+          );
+
+        }
+      );
+    }
+  );
+
+  window.addEventListener(
+    "keydown",
+    (event) => {
+
+      if (
+        event.key ===
+          "ArrowUp" ||
+        event.key === "w"
+      ) {
+        movePlayer(0, -1);
+      }
+
+      if (
+        event.key ===
+          "ArrowDown" ||
+        event.key === "s"
+      ) {
+        movePlayer(0, 1);
+      }
+
+      if (
+        event.key ===
+          "ArrowLeft" ||
+        event.key === "a"
+      ) {
+        movePlayer(-1, 0);
+      }
+
+      if (
+        event.key ===
+          "ArrowRight" ||
+        event.key === "d"
+      ) {
+        movePlayer(1, 0);
+      }
+
+    }
+  );
 }
 
 /* =========================
@@ -732,99 +1406,151 @@ function checkLevel() {
 ========================= */
 
 function setupNavigation() {
-  const navButtons =
-    document.querySelectorAll("[data-nav]");
 
-  navButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const section = button.dataset.nav;
+  document
+    .querySelectorAll("[data-nav]")
+    .forEach((button) => {
 
-      openNavigation(section);
+      button.addEventListener(
+        "click",
+        () => {
+
+          openNavigation(
+            button.dataset.nav
+          );
+
+        }
+      );
+
     });
-  });
 }
 
-function openNavigation(section) {
-  const modal = $("modal");
-  const modalTitle = $("modal-title");
-  const modalText = $("modal-text");
+function openNavigation(
+  section
+) {
 
-  if (!modal) return;
+  const modal =
+    $("modal");
+
+  const title =
+    $("modal-title");
+
+  const text =
+    $("modal-text");
+
+  if (!modal) {
+    return;
+  }
 
   const names = {
-    operations: "operations",
-    missions: "missions",
-    market: "marketNav",
-    ranking: "ranking",
-    profile: "profile"
+
+    operations:
+      "operations",
+
+    missions:
+      "missions",
+
+    market:
+      "marketNav",
+
+    ranking:
+      "ranking",
+
+    profile:
+      "profile"
+
   };
 
-  if (modalTitle) {
-    modalTitle.textContent =
-      t(names[section] || section);
+  if (title) {
+
+    title.textContent =
+      t(
+        names[section] ||
+        section
+      );
+
   }
 
-  if (modalText) {
-    modalText.textContent =
+  if (text) {
+
+    text.textContent =
       t("comingSoon");
+
   }
 
-  modal.classList.remove("hidden");
+  modal.classList.remove(
+    "hidden"
+  );
 }
 
 /* =========================
    MODALS
 ========================= */
 
-function showMessage(message) {
-  const modal = $("modal");
-  const title = $("modal-title");
-  const text = $("modal-text");
+function showMessage(
+  message
+) {
 
-  if (!modal) return;
+  const modal =
+    $("modal");
+
+  const title =
+    $("modal-title");
+
+  const text =
+    $("modal-text");
+
+  if (!modal) {
+    return;
+  }
 
   if (title) {
-    title.textContent = "NEXUS";
+    title.textContent =
+      "NEXUS";
   }
 
   if (text) {
-    text.textContent = message;
+    text.textContent =
+      message;
   }
 
-  modal.classList.remove("hidden");
+  modal.classList.remove(
+    "hidden"
+  );
 }
 
 function setupModals() {
-  const closeModal = $("close-modal");
+
+  const closeModal =
+    $("close-modal");
 
   if (closeModal) {
-    closeModal.addEventListener(
-      "click",
+
+    closeModal.onclick =
       () => {
-        $("modal")?.classList.add("hidden");
-      }
-    );
+
+        $("modal")
+          ?.classList
+          .add("hidden");
+
+      };
+
   }
 
-  const closePanel = $("close-panel");
+  const closePanel =
+    $("close-panel");
 
   if (closePanel) {
-    closePanel.addEventListener(
-      "click",
+
+    closePanel.onclick =
       () => {
-        $("action-panel")?.classList.add("hidden");
-      }
-    );
-  }
 
-  const operationButton =
-    $("operation-button");
+        $("action-panel")
+          ?.classList
+          .add("hidden");
 
-  if (operationButton) {
-    operationButton.addEventListener(
-      "click",
-      performOperation
-    );
+      };
+
   }
 }
 
@@ -833,16 +1559,21 @@ function setupModals() {
 ========================= */
 
 function checkDailyReward() {
-  const lastReward =
+
+  const today =
+    new Date()
+      .toISOString()
+      .slice(0, 10);
+
+  const last =
     localStorage.getItem(
       "nexus_last_daily_reward"
     );
 
-  const today =
-    new Date().toISOString().slice(0, 10);
+  if (last !== today) {
 
-  if (lastReward !== today) {
-    state.nex += 1000;
+    state.nex +=
+      1000;
 
     localStorage.setItem(
       "nexus_last_daily_reward",
@@ -850,7 +1581,35 @@ function checkDailyReward() {
     );
 
     saveState();
+
     updateHUD();
+  }
+}
+
+/* =========================
+   LEVEL
+========================= */
+
+function checkLevel() {
+
+  const requiredXP =
+    state.level * 500;
+
+  if (
+    state.xp >= requiredXP
+  ) {
+
+    state.xp -=
+      requiredXP;
+
+    state.level +=
+      1;
+
+    state.cityLevel +=
+      1;
+
+    state.cityValue +=
+      500;
   }
 }
 
@@ -859,55 +1618,84 @@ function checkDailyReward() {
 ========================= */
 
 function animate() {
-  requestAnimationFrame(animate);
+
+  requestAnimationFrame(
+    animate
+  );
 
   if (controls) {
     controls.update();
   }
 
   if (player) {
-    player.rotation.y += 0.005;
+    player.rotation.y +=
+      0.005;
   }
 
-  if (renderer && scene && camera) {
-    renderer.render(scene, camera);
+  if (
+    renderer &&
+    scene &&
+    camera
+  ) {
+
+    renderer.render(
+      scene,
+      camera
+    );
+
   }
 }
 
 /* =========================
-   START GAME
+   START
 ========================= */
 
 function startGame() {
+
   setupMovement();
+
   setupNavigation();
+
   setupModals();
 
   updateInterface();
 
   if (!state.language) {
-    const languageScreen =
-      $("language-screen");
 
-    languageScreen?.classList.remove(
-      "hidden"
-    );
+    $("language-screen")
+      ?.classList
+      .remove("hidden");
+
   }
 
   checkDailyReward();
 
   init3D();
 
-  setTimeout(() => {
-    $("loading")?.classList.add("hidden");
-  }, 1200);
+  setTimeout(
+    () => {
+
+      $("loading")
+        ?.classList
+        .add("hidden");
+
+    },
+    1200
+  );
 }
 
-if (document.readyState === "loading") {
+if (
+  document.readyState ===
+  "loading"
+) {
+
   document.addEventListener(
     "DOMContentLoaded",
     startGame
   );
+
 } else {
+
   startGame();
+
 }
