@@ -1,701 +1,1650 @@
-import * as THREE from "three";
-import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js";
+
+/* =========================================================
+   NEXUS | SECRET CITY
+   Game Engine
+   ========================================================= */
 
 const tg = window.Telegram?.WebApp;
 
 if (tg) {
-  tg.ready();
-  tg.expand();
+  try {
+    tg.ready();
+    tg.expand();
+  } catch (e) {
+    console.warn("Telegram WebApp init:", e);
+  }
 }
 
-/* =========================
-   GAME STATE
-========================= */
-
-const state = {
-  language: localStorage.getItem("nexus_language") || null,
-
-  nex: Number(localStorage.getItem("nexus_nex") || 10000),
-
-  energy: Number(
-    localStorage.getItem("nexus_energy") || 100
-  ),
-
-  xp: Number(
-    localStorage.getItem("nexus_xp") || 0
-  ),
-
-  level: Number(
-    localStorage.getItem("nexus_level") || 1
-  ),
-
-  cityValue: Number(
-    localStorage.getItem("nexus_city_value") || 1000
-  ),
-
-  cityLevel: Number(
-    localStorage.getItem("nexus_city_level") || 1
-  ),
-
-  selectedBuilding: null
-};
-
-/* =========================
+/* =========================================================
    TRANSLATIONS
-========================= */
+   ========================================================= */
 
-const translations = {
-
+const TEXT = {
   fa: {
-
-    title: "NEXUS",
-    subtitle: "شهر مخفی",
-
-    chooseLanguage: "زبان را انتخاب کنید",
-    persian: "فارسی",
-    english: "English",
-
-    nex: "NEX",
+    chooseLanguage: "زبان خود را انتخاب کنید",
+    enterCity: "ورود به شهر",
+    cityValue: "ارزش شهر",
     energy: "انرژی",
     level: "سطح",
     xp: "تجربه",
-    cityValue: "ارزش شهر",
-
-    hq: "مرکز فرماندهی",
-    bank: "بانک",
-    intelligence: "مرکز اطلاعات",
-    market: "بازار",
-
+    nex: "NEX",
     operations: "عملیات",
-    missions: "ماموریت‌ها",
-    marketNav: "بازار",
+    missions: "مأموریت‌ها",
+    market: "بازار",
     ranking: "رتبه‌بندی",
     profile: "پروفایل",
 
-    move: "حرکت",
-    interact: "ورود",
+    hq: "ستاد مرکزی",
+    bank: "بانک",
+    intelligence: "مرکز اطلاعات",
+    marketBuilding: "بازار",
+
+    hqDesc: "مرکز فرماندهی شهر و محل انجام عملیات.",
+    bankDesc: "مدیریت دارایی‌ها و اقتصاد شهر.",
+    intelligenceDesc: "اینجا پرونده‌های مخفی و مأموریت‌های ویژه پیدا می‌شوند.",
+    marketDesc: "بازار شهر برای خرید تجهیزات و امکانات.",
+
+    enter: "ورود",
     close: "بستن",
+    back: "بازگشت",
 
-    welcome: "به شهر مخفی خوش آمدی",
+    startMission: "شروع مأموریت",
+    continueMission: "ادامه مأموریت",
+    completed: "تکمیل شد",
 
-    welcomeText:
-      "شهر را کاوش کن، ساختمان‌ها را فعال کن و NEX به دست بیاور.",
+    cost: "هزینه",
+    reward: "پاداش",
+    risk: "ریسک",
 
-    hqText:
-      "مرکز اصلی مدیریت شهر و آغاز عملیات.",
+    low: "کم",
+    medium: "متوسط",
+    high: "زیاد",
 
-    bankText:
-      "مدیریت سرمایه، سپرده‌ها و درآمد شهر.",
+    noEnergy: "انرژی کافی نداری.",
+    noNex: "NEX کافی نداری.",
+    missionStarted: "مأموریت آغاز شد.",
+    missionComplete: "مأموریت با موفقیت تکمیل شد.",
+    missionFailed: "مأموریت شکست خورد.",
+    dailyReward: "پاداش روزانه دریافت شد: 1000 NEX",
 
-    intelligenceText:
-      "مرکز اطلاعات، مأموریت‌ها و عملیات ویژه.",
+    comingSoon: "این بخش به‌زودی فعال می‌شود.",
 
-    marketText:
-      "خرید تجهیزات و آیتم‌های مورد نیاز شهر.",
+    reconTitle: "شناسایی منطقه ۷",
+    reconDesc:
+      "یک پیام رمزگذاری‌شده از منطقه ۷ دریافت شده. کسی نمی‌داند فرستنده کیست. باید قبل از اینکه ردپا از بین برود، منطقه را بررسی کنی.",
 
-    enterBuilding:
-      "ورود به ساختمان",
+    shadowTitle: "پرونده: سایه",
+    shadowDesc:
+      "دوربین‌های شهر یک فرد ناشناس را ثبت کرده‌اند. او چند بار در اطراف بانک دیده شده و هر بار قبل از رسیدن نیروهای امنیتی ناپدید شده است.",
 
-    buildingOperations:
-      "عملیات موجود",
+    blackoutTitle: "هشدار: خاموشی",
+    blackoutDesc:
+      "بخشی از شهر ناگهان خاموش شده. سیستم امنیتی مرکز اطلاعات نیز از کار افتاده است.",
 
-    operationOne:
-      "عملیات شناسایی",
+    clueTitle: "سرنخ جدید",
+    clueDesc:
+      "یک فایل رمزگذاری‌شده پیدا کردی. برای باز کردن آن باید تصمیم بگیری از کدام مسیر استفاده کنی.",
 
-    operationOneText:
-      "یک مأموریت کم‌ریسک برای افزایش XP و درآمد.",
+    follow: "تعقیب فرد ناشناس",
+    cameras: "بررسی دوربین‌ها",
+    agent: "فرستادن مأمور",
+    wait: "صبر کردن",
 
-    cost:
-      "هزینه",
+    hack: "نفوذ به سیستم",
+    investigateBank: "بررسی بانک",
+    callSecurity: "تماس با امنیت",
 
-    reward:
-      "پاداش",
+    openFile: "باز کردن فایل",
+    destroyFile: "حذف فایل",
 
-    risk:
-      "ریسک",
+    success: "موفقیت",
+    failure: "شکست",
+    continue: "ادامه",
 
-    low:
-      "کم",
+    rewardText: "پاداش",
+    energyText: "انرژی",
+    nexText: "NEX",
+    xpText: "XP",
 
-    medium:
-      "متوسط",
-
-    high:
-      "زیاد",
-
-    execute:
-      "اجرای عملیات",
-
-    comingSoon:
-      "این بخش در مرحله بعدی توسعه فعال می‌شود.",
-
-    energyEmpty:
-      "انرژی کافی نیست.",
-
-    nexEmpty:
-      "NEX کافی نیست.",
-
-    operationSuccess:
-      "عملیات با موفقیت انجام شد.",
-
-    operationFailed:
-      "عملیات شکست خورد.",
-
-    daily:
-      "پاداش روزانه",
-
-    dailyText:
-      "پاداش روزانه آماده دریافت است."
+    daily: "پاداش روزانه"
   },
 
   en: {
-
-    title: "NEXUS",
-    subtitle: "Secret City",
-
     chooseLanguage: "Choose your language",
-    persian: "فارسی",
-    english: "English",
-
-    nex: "NEX",
+    enterCity: "Enter City",
+    cityValue: "City Value",
     energy: "Energy",
     level: "Level",
     xp: "XP",
-    cityValue: "City Value",
+    nex: "NEX",
+    operations: "Operations",
+    missions: "Missions",
+    market: "Market",
+    ranking: "Ranking",
+    profile: "Profile",
 
     hq: "Headquarters",
     bank: "Bank",
     intelligence: "Intelligence Center",
-    market: "Market",
+    marketBuilding: "Market",
 
-    operations: "Operations",
-    missions: "Missions",
-    marketNav: "Market",
-    ranking: "Ranking",
-    profile: "Profile",
+    hqDesc: "The command center of the city and the place for operations.",
+    bankDesc: "Manage your assets and city economy.",
+    intelligenceDesc: "Secret files and special missions are discovered here.",
+    marketDesc: "Buy equipment and city upgrades.",
 
-    move: "Move",
-    interact: "Enter",
+    enter: "Enter",
     close: "Close",
+    back: "Back",
 
-    welcome: "Welcome to the Secret City",
+    startMission: "Start Mission",
+    continueMission: "Continue Mission",
+    completed: "Completed",
 
-    welcomeText:
-      "Explore the city, activate buildings and earn NEX.",
+    cost: "Cost",
+    reward: "Reward",
+    risk: "Risk",
 
-    hqText:
-      "The main city management center and operation hub.",
+    low: "Low",
+    medium: "Medium",
+    high: "High",
 
-    bankText:
-      "Manage capital, deposits and city income.",
+    noEnergy: "Not enough energy.",
+    noNex: "Not enough NEX.",
+    missionStarted: "Mission started.",
+    missionComplete: "Mission completed successfully.",
+    missionFailed: "Mission failed.",
+    dailyReward: "Daily reward received: 1000 NEX",
 
-    intelligenceText:
-      "Information, missions and special operations.",
+    comingSoon: "This section is coming soon.",
 
-    marketText:
-      "Purchase equipment and useful city items.",
+    reconTitle: "Sector 7 Recon",
+    reconDesc:
+      "An encrypted message has arrived from Sector 7. Nobody knows who sent it. Investigate the area before the trail disappears.",
 
-    enterBuilding:
-      "Enter Building",
+    shadowTitle: "Case: The Shadow",
+    shadowDesc:
+      "City cameras recorded an unknown person. They have been seen near the bank several times and disappear before security arrives.",
 
-    buildingOperations:
-      "Available Operations",
+    blackoutTitle: "Alert: Blackout",
+    blackoutDesc:
+      "Part of the city has suddenly gone dark. The intelligence center security system is offline.",
 
-    operationOne:
-      "Recon Operation",
+    clueTitle: "New Clue",
+    clueDesc:
+      "You found an encrypted file. To open it, you must choose which route to take.",
 
-    operationOneText:
-      "A low-risk operation for earning XP and income.",
+    follow: "Follow the stranger",
+    cameras: "Check the cameras",
+    agent: "Send an agent",
+    wait: "Wait",
 
-    cost:
-      "Cost",
+    hack: "Hack the system",
+    investigateBank: "Investigate the bank",
+    callSecurity: "Call security",
 
-    reward:
-      "Reward",
+    openFile: "Open the file",
+    destroyFile: "Delete the file",
 
-    risk:
-      "Risk",
+    success: "Success",
+    failure: "Failure",
+    continue: "Continue",
 
-    low:
-      "Low",
+    rewardText: "Reward",
+    energyText: "Energy",
+    nexText: "NEX",
+    xpText: "XP",
 
-    medium:
-      "Medium",
-
-    high:
-      "High",
-
-    execute:
-      "Execute Operation",
-
-    comingSoon:
-      "This section will be activated in the next development stage.",
-
-    energyEmpty:
-      "Not enough energy.",
-
-    nexEmpty:
-      "Not enough NEX.",
-
-    operationSuccess:
-      "Operation completed successfully.",
-
-    operationFailed:
-      "Operation failed.",
-
-    daily:
-      "Daily Reward",
-
-    dailyText:
-      "Your daily reward is ready."
+    daily: "Daily Reward"
   }
 };
 
-/* =========================
-   HELPERS
-========================= */
+/* =========================================================
+   GAME STATE
+   ========================================================= */
 
-function $(id) {
-  return document.getElementById(id);
-}
+const DEFAULT_STATE = {
+  language: null,
+  nex: 10000,
+  energy: 100,
+  xp: 0,
+  level: 1,
+  cityValue: 100000,
+  cityLevel: 1,
 
-function t(key) {
+  dailyClaimed: null,
 
-  const lang =
-    state.language || "fa";
+  missions: {
+    recon: "available",
+    shadow: "locked",
+    blackout: "locked"
+  },
 
-  return (
-    translations[lang]?.[key] ||
-    translations.fa[key] ||
-    key
-  );
+  missionProgress: {
+    recon: 0,
+    shadow: 0,
+    blackout: 0
+  },
+
+  completedMissions: [],
+
+  inventory: []
+};
+
+let state = loadState();
+
+function loadState() {
+  try {
+    const saved = localStorage.getItem("NEXUS_STATE");
+
+    if (saved) {
+      return {
+        ...DEFAULT_STATE,
+        ...JSON.parse(saved),
+        missions: {
+          ...DEFAULT_STATE.missions,
+          ...(JSON.parse(saved).missions || {})
+        },
+        missionProgress: {
+          ...DEFAULT_STATE.missionProgress,
+          ...(JSON.parse(saved).missionProgress || {})
+        }
+      };
+    }
+  } catch (error) {
+    console.warn("Could not load state:", error);
+  }
+
+  return structuredClone(DEFAULT_STATE);
 }
 
 function saveState() {
-
-  localStorage.setItem(
-    "nexus_language",
-    state.language || "fa"
-  );
-
-  localStorage.setItem(
-    "nexus_nex",
-    state.nex
-  );
-
-  localStorage.setItem(
-    "nexus_energy",
-    state.energy
-  );
-
-  localStorage.setItem(
-    "nexus_xp",
-    state.xp
-  );
-
-  localStorage.setItem(
-    "nexus_level",
-    state.level
-  );
-
-  localStorage.setItem(
-    "nexus_city_value",
-    state.cityValue
-  );
-
-  localStorage.setItem(
-    "nexus_city_level",
-    state.cityLevel
-  );
+  try {
+    localStorage.setItem("NEXUS_STATE", JSON.stringify(state));
+  } catch (error) {
+    console.warn("Could not save state:", error);
+  }
 }
 
-/* =========================
+/* =========================================================
+   HELPERS
+   ========================================================= */
+
+function t(key) {
+  return TEXT[state.language || "fa"][key] || key;
+}
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function random(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function addXP(amount) {
+  state.xp += amount;
+
+  const required = state.level * 500;
+
+  if (state.xp >= required) {
+    state.xp -= required;
+    state.level += 1;
+    state.cityLevel += 1;
+    state.cityValue += 5000;
+
+    showMessage(
+      state.language === "fa"
+        ? `🎉 سطح جدید! سطح ${state.level}`
+        : `🎉 Level up! Level ${state.level}`
+    );
+  }
+}
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const $ = (id) => document.getElementById(id);
+
+function setText(id, value) {
+  const el = $(id);
+  if (el) el.textContent = value;
+}
+
+function showElement(id) {
+  const el = $(id);
+  if (el) el.style.display = "";
+}
+
+function hideElement(id) {
+  const el = $(id);
+  if (el) el.style.display = "none";
+}
+
+/* =========================================================
    LANGUAGE
-========================= */
+   ========================================================= */
 
-function setLanguage(lang) {
+function setLanguage(language) {
+  if (!TEXT[language]) return;
 
-  state.language = lang;
-
+  state.language = language;
   saveState();
 
-  document.documentElement.lang =
-    lang;
-
-  document.documentElement.dir =
-    lang === "fa"
-      ? "rtl"
-      : "ltr";
+  document.documentElement.lang = language;
+  document.documentElement.dir = language === "fa" ? "rtl" : "ltr";
 
   updateInterface();
 
-  const screen =
-    $("language-screen");
+  const screen = $("language-screen");
 
   if (screen) {
-    screen.classList.add("hidden");
+    screen.style.display = "none";
+  }
+
+  const game = $("game-container");
+
+  if (game) {
+    game.style.display = "block";
   }
 }
 
-window.NEXUS_setLanguage =
-  setLanguage;
+window.NEXUS_setLanguage = setLanguage;
 
-/* =========================
+/* =========================================================
    INTERFACE
-========================= */
+   ========================================================= */
 
 function updateInterface() {
-
-  document
-    .querySelectorAll("[data-i18n]")
-    .forEach((element) => {
-
-      const key =
-        element.dataset.i18n;
-
-      element.textContent =
-        t(key);
-    });
-
   updateHUD();
+  updateStaticTexts();
 }
-
-/* =========================
-   HUD
-========================= */
 
 function updateHUD() {
+  setText("nex-value", state.nex.toLocaleString());
+  setText("energy-value", state.energy.toLocaleString());
+  setText("xp-value", state.xp.toLocaleString());
+  setText("level-value", state.level.toString());
+  setText("city-value", state.cityValue.toLocaleString());
 
-  const nex =
-    $("nex-value");
+  const xpBar = $("xp-bar");
 
-  const energy =
-    $("energy-value");
-
-  const level =
-    $("level-value");
-
-  const xp =
-    $("xp-value");
-
-  const city =
-    $("city-value");
-
-  if (nex) {
-    nex.textContent =
-      state.nex.toLocaleString();
-  }
-
-  if (energy) {
-    energy.textContent =
-      state.energy;
-  }
-
-  if (level) {
-    level.textContent =
-      state.level;
-  }
-
-  if (xp) {
-    xp.textContent =
-      state.xp;
-  }
-
-  if (city) {
-    city.textContent =
-      state.cityValue.toLocaleString();
+  if (xpBar) {
+    const required = state.level * 500;
+    const percent = clamp((state.xp / required) * 100, 0, 100);
+    xpBar.style.width = `${percent}%`;
   }
 }
 
-/* =========================
-   THREE.JS
-========================= */
+function updateStaticTexts() {
+  setText("city-value-label", t("cityValue"));
+  setText("energy-label", t("energy"));
+  setText("level-label", t("level"));
+  setText("xp-label", t("xp"));
+
+  setText("nav-operations", t("operations"));
+  setText("nav-missions", t("missions"));
+  setText("nav-market", t("market"));
+  setText("nav-ranking", t("ranking"));
+  setText("nav-profile", t("profile"));
+}
+
+/* =========================================================
+   MESSAGE
+   ========================================================= */
+
+function showMessage(message) {
+  const box = $("message-box");
+
+  if (!box) {
+    console.log(message);
+    return;
+  }
+
+  box.textContent = message;
+  box.classList.add("show");
+
+  clearTimeout(showMessage.timer);
+
+  showMessage.timer = setTimeout(() => {
+    box.classList.remove("show");
+  }, 3000);
+}
+
+/* =========================================================
+   MODAL
+   ========================================================= */
+
+function openModal(title, content, buttons = []) {
+  const modal = $("modal");
+  const modalTitle = $("modal-title");
+  const modalContent = $("modal-content");
+  const modalButtons = $("modal-buttons");
+
+  if (!modal || !modalTitle || !modalContent || !modalButtons) return;
+
+  modalTitle.textContent = title;
+  modalContent.innerHTML = content;
+  modalButtons.innerHTML = "";
+
+  buttons.forEach((button) => {
+    const btn = document.createElement("button");
+
+    btn.className = `action-button ${button.className || ""}`;
+    btn.textContent = button.text;
+
+    btn.addEventListener("click", () => {
+      if (button.action) button.action();
+    });
+
+    modalButtons.appendChild(btn);
+  });
+
+  modal.classList.add("active");
+}
+
+function closeModal() {
+  const modal = $("modal");
+
+  if (modal) {
+    modal.classList.remove("active");
+  }
+}
+
+function setupModals() {
+  const close = $("modal-close");
+
+  if (close) {
+    close.addEventListener("click", closeModal);
+  }
+
+  const modal = $("modal");
+
+  if (modal) {
+    modal.addEventListener("click", (event) => {
+      if (event.target === modal) {
+        closeModal();
+      }
+    });
+  }
+}
+
+/* =========================================================
+   BUILDINGS
+   ========================================================= */
+
+function openBuilding(type) {
+  if (type === "hq") {
+    openHQ();
+    return;
+  }
+
+  if (type === "intelligence") {
+    openIntelligence();
+    return;
+  }
+
+  if (type === "bank") {
+    openBank();
+    return;
+  }
+
+  if (type === "market") {
+    openMarket();
+    return;
+  }
+}
+
+function openHQ() {
+  openModal(
+    t("hq"),
+    `
+      <div class="building-description">
+        ${t("hqDesc")}
+      </div>
+
+      <div class="stat-card">
+        <strong>${t("nex")}</strong>
+        <span>${state.nex.toLocaleString()}</span>
+      </div>
+
+      <div class="stat-card">
+        <strong>${t("energy")}</strong>
+        <span>${state.energy}</span>
+      </div>
+
+      <div class="stat-card">
+        <strong>${t("xp")}</strong>
+        <span>${state.xp}</span>
+      </div>
+    `,
+    [
+      {
+        text: `🎯 ${t("operations")}`,
+        action: () => showOperations()
+      }
+    ]
+  );
+}
+
+/* =========================================================
+   OPERATIONS
+   ========================================================= */
+
+function showOperations() {
+  openModal(
+    t("operations"),
+    `
+      <div class="mission-card">
+        <h3>🎯 ${state.language === "fa" ? "عملیات شناسایی" : "Recon Operation"}</h3>
+
+        <p>
+          ${
+            state.language === "fa"
+              ? "یک منطقه ناشناخته در حاشیه شهر شناسایی شده است."
+              : "An unknown area has been detected on the edge of the city."
+          }
+        </p>
+
+        <div class="mission-meta">
+          <span>💰 500 NEX</span>
+          <span>⚡ 10 ${t("energy")}</span>
+          <span>🎁 1500 NEX</span>
+        </div>
+      </div>
+    `,
+    [
+      {
+        text: state.language === "fa" ? "اجرای عملیات" : "Execute",
+        action: performOperation
+      },
+      {
+        text: t("close"),
+        action: closeModal
+      }
+    ]
+  );
+}
+
+function performOperation() {
+  if (state.energy < 10) {
+    showMessage(t("noEnergy"));
+    return;
+  }
+
+  if (state.nex < 500) {
+    showMessage(t("noNex"));
+    return;
+  }
+
+  state.energy -= 10;
+  state.nex -= 500;
+
+  const success = Math.random() < 0.85;
+
+  if (success) {
+    state.nex += 1500;
+    state.cityValue += 100;
+    addXP(50);
+
+    saveState();
+    updateHUD();
+
+    showMessage(
+      state.language === "fa"
+        ? "✅ عملیات موفق بود! +1500 NEX و +50 XP"
+        : "✅ Operation successful! +1500 NEX and +50 XP"
+    );
+  } else {
+    addXP(10);
+
+    saveState();
+    updateHUD();
+
+    showMessage(
+      state.language === "fa"
+        ? "❌ عملیات شکست خورد، اما +10 XP گرفتی."
+        : "❌ Operation failed, but you gained +10 XP."
+    );
+  }
+
+  closeModal();
+}
+
+/* =========================================================
+   INTELLIGENCE CENTER
+   ========================================================= */
+
+function openIntelligence() {
+  const available = [];
+
+  if (state.missions.recon === "available") {
+    available.push(`
+      <div class="mission-card">
+        <h3>🛰️ ${t("reconTitle")}</h3>
+        <p>${t("reconDesc")}</p>
+
+        <div class="mission-meta">
+          <span>⚡ 15</span>
+          <span>💰 +2000 NEX</span>
+          <span>⭐ +100 XP</span>
+        </div>
+
+        <button class="action-button" id="start-recon">
+          ${t("startMission")}
+        </button>
+      </div>
+    `);
+  }
+
+  if (state.missions.shadow === "available") {
+    available.push(`
+      <div class="mission-card">
+        <h3>🌑 ${t("shadowTitle")}</h3>
+        <p>${t("shadowDesc")}</p>
+
+        <div class="mission-meta">
+          <span>⚡ 20</span>
+          <span>💰 +4000 NEX</span>
+          <span>⭐ +200 XP</span>
+        </div>
+
+        <button class="action-button" id="start-shadow">
+          ${t("startMission")}
+        </button>
+      </div>
+    `);
+  }
+
+  if (state.missions.blackout === "available") {
+    available.push(`
+      <div class="mission-card">
+        <h3>⚠️ ${t("blackoutTitle")}</h3>
+        <p>${t("blackoutDesc")}</p>
+
+        <div class="mission-meta">
+          <span>⚡ 25</span>
+          <span>💰 +6000 NEX</span>
+          <span>⭐ +300 XP</span>
+        </div>
+
+        <button class="action-button" id="start-blackout">
+          ${t("startMission")}
+        </button>
+      </div>
+    `);
+  }
+
+  if (!available.length) {
+    available.push(`
+      <div class="empty-state">
+        🔒
+        <br>
+        ${
+          state.language === "fa"
+            ? "فعلاً پرونده جدیدی برای تو باز نشده."
+            : "No new files are available for you yet."
+        }
+      </div>
+    `);
+  }
+
+  openModal(t("intelligence"), available.join(""));
+
+  setTimeout(() => {
+    const recon = $("start-recon");
+    const shadow = $("start-shadow");
+    const blackout = $("start-blackout");
+
+    if (recon) recon.onclick = () => startMission("recon");
+    if (shadow) shadow.onclick = () => startMission("shadow");
+    if (blackout) blackout.onclick = () => startMission("blackout");
+  }, 0);
+}
+
+/* =========================================================
+   MISSION ENGINE
+   ========================================================= */
+
+function startMission(id) {
+  if (id === "recon") {
+    startRecon();
+    return;
+  }
+
+  if (id === "shadow") {
+    startShadow();
+    return;
+  }
+
+  if (id === "blackout") {
+    startBlackout();
+  }
+}
+
+/* =========================================================
+   RECON MISSION
+   ========================================================= */
+
+function startRecon() {
+  if (state.energy < 15) {
+    showMessage(t("noEnergy"));
+    return;
+  }
+
+  state.energy -= 15;
+  state.missions.recon = "active";
+  state.missionProgress.recon = 1;
+
+  saveState();
+  updateHUD();
+
+  reconStepOne();
+}
+
+function reconStepOne() {
+  openModal(
+    t("reconTitle"),
+    `
+      <div class="story-box">
+        <p>
+          ${
+            state.language === "fa"
+              ? "ساعت 02:17 بامداد است. یک پیام رمزگذاری‌شده روی کانال اضطراری ظاهر می‌شود."
+              : "It is 02:17 AM. An encrypted message suddenly appears on the emergency channel."
+          }
+        </p>
+
+        <p>
+          ${
+            state.language === "fa"
+              ? "مختصات مربوط به یک کوچه تاریک در منطقه ۷ است."
+              : "The coordinates point to a dark alley in Sector 7."
+          }
+        </p>
+      </div>
+    `,
+    [
+      {
+        text: `👁️ ${t("follow")}`,
+        action: () => reconChoice("follow")
+      },
+      {
+        text: `📹 ${t("cameras")}`,
+        action: () => reconChoice("cameras")
+      },
+      {
+        text: `🕵️ ${t("agent")}`,
+        action: () => reconChoice("agent")
+      }
+    ]
+  );
+}
+
+function reconChoice(choice) {
+  state.missionProgress.recon = 2;
+
+  if (choice === "follow") {
+    const success = Math.random() < 0.75;
+
+    if (success) {
+      reconSuccess(
+        state.language === "fa"
+          ? "رد فرد ناشناس را گرفتی و یک کیف حاوی اسناد محرمانه پیدا کردی."
+          : "You followed the stranger and found a bag containing classified documents."
+      );
+    } else {
+      reconFailure(
+        state.language === "fa"
+          ? "فرد ناشناس متوجه حضور تو شد و در تاریکی ناپدید شد."
+          : "The stranger noticed you and disappeared into the darkness."
+      );
+    }
+
+    return;
+  }
+
+  if (choice === "cameras") {
+    openModal(
+      t("clueTitle"),
+      `
+        <div class="story-box">
+          ${
+            state.language === "fa"
+              ? "در یکی از فریم‌ها پلاک یک خودرو را پیدا می‌کنی. خودرو چند دقیقه بعد در نزدیکی بانک دیده شده است."
+              : "You find a vehicle plate number in one frame. The vehicle was later seen near the bank."
+          }
+        </div>
+      `,
+      [
+        {
+          text: `🏦 ${t("investigateBank")}`,
+          action: () => {
+            reconSuccess(
+              state.language === "fa"
+                ? "بررسی اطلاعات بانک یک سرنخ مهم در اختیار تو گذاشت."
+                : "Investigating the bank provided an important clue."
+            );
+          }
+        },
+        {
+          text: `📡 ${t("callSecurity")}`,
+          action: () => {
+            reconSuccess(
+              state.language === "fa"
+                ? "امنیت شهر خودرو را شناسایی کرد و پرونده با موفقیت بسته شد."
+                : "City security identified the vehicle and the case was successfully closed."
+            );
+          }
+        }
+      ]
+    );
+
+    return;
+  }
+
+  if (choice === "agent") {
+    const success = Math.random() < 0.9;
+
+    if (success) {
+      reconSuccess(
+        state.language === "fa"
+          ? "مأمور تو بدون جلب توجه وارد منطقه شد و یک فایل رمزگذاری‌شده پیدا کرد."
+          : "Your agent entered the area unnoticed and found an encrypted file."
+      );
+    } else {
+      reconFailure(
+        state.language === "fa"
+          ? "مأمور قبل از رسیدن به محل شناسایی شد."
+          : "The agent was detected before reaching the location."
+      );
+    }
+  }
+}
+
+function reconSuccess(message) {
+  state.nex += 2000;
+  state.cityValue += 500;
+  addXP(100);
+
+  state.missions.recon = "completed";
+
+  if (!state.completedMissions.includes("recon")) {
+    state.completedMissions.push("recon");
+  }
+
+  state.missions.shadow = "available";
+
+  saveState();
+  updateHUD();
+
+  openModal(
+    `✅ ${t("success")}`,
+    `
+      <div class="story-box success-box">
+        <p>${message}</p>
+
+        <div class="reward-box">
+          💰 +2000 NEX
+          <br>
+          ⭐ +100 XP
+        </div>
+      </div>
+    `,
+    [
+      {
+        text: t("continue"),
+        action: () => {
+          closeModal();
+          showMessage(t("missionComplete"));
+        }
+      }
+    ]
+  );
+}
+
+function reconFailure(message) {
+  addXP(25);
+
+  state.missions.recon = "completed";
+
+  if (!state.completedMissions.includes("recon")) {
+    state.completedMissions.push("recon");
+  }
+
+  state.missions.shadow = "available";
+
+  saveState();
+  updateHUD();
+
+  openModal(
+    `❌ ${t("failure")}`,
+    `
+      <div class="story-box">
+        <p>${message}</p>
+
+        <div class="reward-box">
+          ⭐ +25 XP
+        </div>
+      </div>
+    `,
+    [
+      {
+        text: t("continue"),
+        action: () => {
+          closeModal();
+          showMessage(t("missionFailed"));
+        }
+      }
+    ]
+  );
+}
+
+/* =========================================================
+   SHADOW MISSION
+   ========================================================= */
+
+function startShadow() {
+  if (state.energy < 20) {
+    showMessage(t("noEnergy"));
+    return;
+  }
+
+  state.energy -= 20;
+  state.missions.shadow = "active";
+  state.missionProgress.shadow = 1;
+
+  saveState();
+  updateHUD();
+
+  openModal(
+    t("shadowTitle"),
+    `
+      <div class="story-box">
+        <p>${t("shadowDesc")}</p>
+
+        <p>
+          ${
+            state.language === "fa"
+              ? "سه انتخاب داری. هرکدام ممکن است مسیر پرونده را تغییر دهد."
+              : "You have three choices. Each one may change the outcome of the case."
+          }
+        </p>
+      </div>
+    `,
+    [
+      {
+        text: `🏦 ${t("investigateBank")}`,
+        action: () => shadowChoice("bank")
+      },
+      {
+        text: `📹 ${t("cameras")}`,
+        action: () => shadowChoice("cameras")
+      },
+      {
+        text: `⏳ ${t("wait")}`,
+        action: () => shadowChoice("wait")
+      }
+    ]
+  );
+}
+
+function shadowChoice(choice) {
+  state.missionProgress.shadow = 2;
+
+  if (choice === "bank") {
+    const success = Math.random() < 0.7;
+
+    if (success) {
+      finishShadow(
+        true,
+        state.language === "fa"
+          ? "در سوابق بانک یک حساب جعلی پیدا کردی که مستقیماً به فرد ناشناس مرتبط بود."
+          : "You found a fake bank account directly connected to the stranger."
+      );
+    } else {
+      finishShadow(
+        false,
+        state.language === "fa"
+          ? "پرونده‌های بانک پاک شده بودند. فقط یک سرنخ کوچک باقی مانده است."
+          : "The bank records had been wiped. Only a small clue remained."
+      );
+    }
+
+    return;
+  }
+
+  if (choice === "cameras") {
+    const success = Math.random() < 0.85;
+
+    if (success) {
+      finishShadow(
+        true,
+        state.language === "fa"
+          ? "تصاویر دوربین مسیر فرار را آشکار کردند."
+          : "The camera footage revealed the escape route."
+      );
+    } else {
+      finishShadow(
+        false,
+        state.language === "fa"
+          ? "سیستم دوربین درست در لحظه مهم از کار افتاد."
+          : "The camera system failed at the critical moment."
+      );
+    }
+
+    return;
+  }
+
+  finishShadow(
+    false,
+    state.language === "fa"
+      ? "تصمیم گرفتی صبر کنی. فرد ناشناس ناپدید شد، اما شاید بعداً دوباره ظاهر شود."
+      : "You decided to wait. The stranger disappeared, but may return later."
+  );
+}
+
+function finishShadow(success, message) {
+  if (success) {
+    state.nex += 4000;
+    state.cityValue += 1000;
+    addXP(200);
+  } else {
+    addXP(50);
+  }
+
+  state.missions.shadow = "completed";
+
+  if (!state.completedMissions.includes("shadow")) {
+    state.completedMissions.push("shadow");
+  }
+
+  state.missions.blackout = "available";
+
+  saveState();
+  updateHUD();
+
+  openModal(
+    success ? `✅ ${t("success")}` : `⚠️ ${t("failure")}`,
+    `
+      <div class="story-box">
+        <p>${message}</p>
+
+        <div class="reward-box">
+          ${
+            success
+              ? "💰 +4000 NEX<br>⭐ +200 XP"
+              : "⭐ +50 XP"
+          }
+        </div>
+      </div>
+    `,
+    [
+      {
+        text: t("continue"),
+        action: () => {
+          closeModal();
+          showMessage(
+            success ? t("missionComplete") : t("missionFailed")
+          );
+        }
+      }
+    ]
+  );
+}
+
+/* =========================================================
+   BLACKOUT MISSION
+   ========================================================= */
+
+function startBlackout() {
+  if (state.energy < 25) {
+    showMessage(t("noEnergy"));
+    return;
+  }
+
+  state.energy -= 25;
+  state.missions.blackout = "active";
+  state.missionProgress.blackout = 1;
+
+  saveState();
+  updateHUD();
+
+  openModal(
+    t("blackoutTitle"),
+    `
+      <div class="story-box">
+        <p>${t("blackoutDesc")}</p>
+
+        <p>
+          ${
+            state.language === "fa"
+              ? "روی صفحه یک فایل ناشناس ظاهر شده. نام فایل: NEXUS_07."
+              : "An unknown file appears on the screen. File name: NEXUS_07."
+          }
+        </p>
+      </div>
+    `,
+    [
+      {
+        text: `💻 ${t("hack")}`,
+        action: () => blackoutChoice("hack")
+      },
+      {
+        text: `🗑️ ${t("destroyFile")}`,
+        action: () => blackoutChoice("destroy")
+      }
+    ]
+  );
+}
+
+function blackoutChoice(choice) {
+  if (choice === "hack") {
+    const success = Math.random() < 0.65;
+
+    if (success) {
+      finishBlackout(
+        true,
+        state.language === "fa"
+          ? "موفق شدی وارد سیستم شوی. چیزی که پیدا کردی، از تمام پرونده‌های قبلی عجیب‌تر است."
+          : "You breached the system. What you found was stranger than all previous files."
+      );
+    } else {
+      finishBlackout(
+        false,
+        state.language === "fa"
+          ? "سیستم دفاعی فعال شد و دسترسی تو قطع شد."
+          : "The defense system activated and your access was cut."
+      );
+    }
+
+    return;
+  }
+
+  finishBlackout(
+    false,
+    state.language === "fa"
+      ? "فایل را حذف کردی. شهر امن‌تر شد، اما شاید مهم‌ترین سرنخ را از دست دادی."
+      : "You destroyed the file. The city is safer, but you may have lost the most important clue."
+  );
+}
+
+function finishBlackout(success, message) {
+  if (success) {
+    state.nex += 6000;
+    state.cityValue += 2500;
+    addXP(300);
+  } else {
+    addXP(75);
+  }
+
+  state.missions.blackout = "completed";
+
+  if (!state.completedMissions.includes("blackout")) {
+    state.completedMissions.push("blackout");
+  }
+
+  saveState();
+  updateHUD();
+
+  openModal(
+    success ? `🏆 ${t("success")}` : `❌ ${t("failure")}`,
+    `
+      <div class="story-box">
+        <p>${message}</p>
+
+        <div class="reward-box">
+          ${
+            success
+              ? "💰 +6000 NEX<br>⭐ +300 XP"
+              : "⭐ +75 XP"
+          }
+        </div>
+      </div>
+    `,
+    [
+      {
+        text: t("continue"),
+        action: () => {
+          closeModal();
+          showMessage(
+            success ? t("missionComplete") : t("missionFailed")
+          );
+        }
+      }
+    ]
+  );
+}
+
+/* =========================================================
+   BANK
+   ========================================================= */
+
+function openBank() {
+  openModal(
+    t("bank"),
+    `
+      <div class="building-description">
+        ${t("bankDesc")}
+      </div>
+
+      <div class="bank-balance">
+        <div>
+          <span>${t("nex")}</span>
+          <strong>${state.nex.toLocaleString()}</strong>
+        </div>
+      </div>
+
+      <div class="info-box">
+        ${
+          state.language === "fa"
+            ? "سیستم اقتصادی پیشرفته بانک در مرحله بعد فعال می‌شود."
+            : "The advanced bank economy system will be activated in the next stage."
+        }
+      </div>
+    `,
+    [
+      {
+        text: t("close"),
+        action: closeModal
+      }
+    ]
+  );
+}
+
+/* =========================================================
+   MARKET
+   ========================================================= */
+
+function openMarket() {
+  openModal(
+    t("marketBuilding"),
+    `
+      <div class="building-description">
+        ${t("marketDesc")}
+      </div>
+
+      <div class="shop-item">
+        <div>
+          <strong>⚡ Energy Pack</strong>
+          <small>+25 Energy</small>
+        </div>
+
+        <button class="action-button" id="buy-energy">
+          750 NEX
+        </button>
+      </div>
+
+      <div class="shop-item">
+        <div>
+          <strong>🛰️ Intelligence Pass</strong>
+          <small>
+            ${
+              state.language === "fa"
+                ? "دسترسی به پرونده‌های ویژه"
+                : "Access special files"
+            }
+          </small>
+        </div>
+
+        <button class="action-button" id="buy-pass">
+          2500 NEX
+        </button>
+      </div>
+    `,
+    [
+      {
+        text: t("close"),
+        action: closeModal
+      }
+    ]
+  );
+
+  setTimeout(() => {
+    const energy = $("buy-energy");
+    const pass = $("buy-pass");
+
+    if (energy) {
+      energy.onclick = buyEnergy;
+    }
+
+    if (pass) {
+      pass.onclick = buyIntelligencePass;
+    }
+  }, 0);
+}
+
+function buyEnergy() {
+  if (state.nex < 750) {
+    showMessage(t("noNex"));
+    return;
+  }
+
+  state.nex -= 750;
+  state.energy = clamp(state.energy + 25, 0, 100);
+
+  saveState();
+  updateHUD();
+
+  showMessage(
+    state.language === "fa"
+      ? "⚡ 25 انرژی خریداری شد."
+      : "⚡ 25 energy purchased."
+  );
+
+  closeModal();
+}
+
+function buyIntelligencePass() {
+  if (state.nex < 2500) {
+    showMessage(t("noNex"));
+    return;
+  }
+
+  state.nex -= 2500;
+
+  if (!state.inventory.includes("intelligence_pass")) {
+    state.inventory.push("intelligence_pass");
+  }
+
+  saveState();
+  updateHUD();
+
+  showMessage(
+    state.language === "fa"
+      ? "🛰️ کارت دسترسی اطلاعاتی خریداری شد."
+      : "🛰️ Intelligence access pass purchased."
+  );
+
+  closeModal();
+}
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+function setupNavigation() {
+  const operations = $("nav-operations");
+  const missions = $("nav-missions");
+  const market = $("nav-market");
+  const ranking = $("nav-ranking");
+  const profile = $("nav-profile");
+
+  if (operations) {
+    operations.onclick = showOperations;
+  }
+
+  if (missions) {
+    missions.onclick = openIntelligence;
+  }
+
+  if (market) {
+    market.onclick = openMarket;
+  }
+
+  if (ranking) {
+    ranking.onclick = () => {
+      openModal(
+        t("ranking"),
+        `
+          <div class="empty-state">
+            🏆
+            <br>
+            ${t("comingSoon")}
+          </div>
+        `,
+        [
+          {
+            text: t("close"),
+            action: closeModal
+          }
+        ]
+      );
+    };
+  }
+
+  if (profile) {
+    profile.onclick = () => {
+      openModal(
+        t("profile"),
+        `
+          <div class="profile-card">
+            <h3>👤 NEXUS Agent</h3>
+
+            <p>${t("level")}: ${state.level}</p>
+            <p>${t("xp")}: ${state.xp}</p>
+            <p>${t("nex")}: ${state.nex.toLocaleString()}</p>
+            <p>
+              ${
+                state.language === "fa"
+                  ? "مأموریت‌های تکمیل‌شده"
+                  : "Completed missions"
+              }:
+              ${state.completedMissions.length}
+            </p>
+          </div>
+        `,
+        [
+          {
+            text: t("close"),
+            action: closeModal
+          }
+        ]
+      );
+    };
+  }
+}
+
+/* =========================================================
+   MOVEMENT
+   ========================================================= */
+
+let player = null;
+let keys = {};
+
+function setupMovement() {
+  document.addEventListener("keydown", (event) => {
+    keys[event.key.toLowerCase()] = true;
+  });
+
+  document.addEventListener("keyup", (event) => {
+    keys[event.key.toLowerCase()] = false;
+  });
+
+  const buttons = {
+    up: "w",
+    down: "s",
+    left: "a",
+    right: "d"
+  };
+
+  Object.entries(buttons).forEach(([id, key]) => {
+    const button = $(id);
+
+    if (!button) return;
+
+    button.addEventListener("pointerdown", () => {
+      keys[key] = true;
+    });
+
+    button.addEventListener("pointerup", () => {
+      keys[key] = false;
+    });
+
+    button.addEventListener("pointercancel", () => {
+      keys[key] = false;
+    });
+
+    button.addEventListener("pointerleave", () => {
+      keys[key] = false;
+    });
+  });
+}
+
+/* =========================================================
+   THREE.JS CITY
+   ========================================================= */
 
 let scene;
 let camera;
 let renderer;
-let controls;
-let player;
+let raycaster;
+let mouse;
 
 const buildings = [];
 
-/* =========================
-   INIT
-========================= */
-
 function init3D() {
+  const canvas = $("game-canvas");
 
-  const container =
-    $("game-container");
-
-  if (!container) {
+  if (!canvas) {
+    console.warn("game-canvas not found.");
     return;
   }
 
-  scene =
-    new THREE.Scene();
+  scene = new THREE.Scene();
 
-  scene.background =
-    new THREE.Color(0x05070d);
+  scene.background = new THREE.Color(0x050914);
 
-  scene.fog =
-    new THREE.Fog(
-      0x05070d,
-      25,
-      90
-    );
-
-  camera =
-    new THREE.PerspectiveCamera(
-      60,
-      window.innerWidth /
-        window.innerHeight,
-      0.1,
-      200
-    );
-
-  camera.position.set(
-    12,
-    11,
-    15
+  camera = new THREE.PerspectiveCamera(
+    60,
+    window.innerWidth / window.innerHeight,
+    0.1,
+    1000
   );
 
-  renderer =
-    new THREE.WebGLRenderer({
-      antialias: true
-    });
+  camera.position.set(22, 20, 25);
 
-  renderer.setPixelRatio(
-    Math.min(
-      window.devicePixelRatio,
-      2
-    )
-  );
+  renderer = new THREE.WebGLRenderer({
+    canvas,
+    antialias: true
+  });
 
-  renderer.setSize(
-    container.clientWidth ||
-      window.innerWidth,
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
 
-    container.clientHeight ||
-      window.innerHeight
-  );
+  renderer.shadowMap.enabled = true;
 
-  renderer.shadowMap.enabled =
-    true;
-
-  container.innerHTML = "";
-
-  container.appendChild(
-    renderer.domElement
-  );
-
-  controls =
-    new OrbitControls(
-      camera,
-      renderer.domElement
-    );
-
-  controls.enableDamping =
-    true;
-
-  controls.enablePan =
-    false;
-
-  controls.minDistance =
-    6;
-
-  controls.maxDistance =
-    35;
-
-  controls.maxPolarAngle =
-    Math.PI / 2.05;
-
-  /* LIGHT */
-
-  const ambient =
-    new THREE.AmbientLight(
-      0x8fa3c5,
-      1.5
-    );
-
+  const ambient = new THREE.AmbientLight(0x778899, 2);
   scene.add(ambient);
 
-  const moon =
-    new THREE.DirectionalLight(
-      0xa9bbff,
-      2.5
-    );
-
-  moon.position.set(
-    -20,
-    30,
-    15
-  );
-
-  moon.castShadow =
-    true;
-
+  const moon = new THREE.DirectionalLight(0xffffff, 2);
+  moon.position.set(20, 40, 10);
+  moon.castShadow = true;
   scene.add(moon);
 
-  /* GROUND */
-
-  const ground =
-    new THREE.Mesh(
-
-      new THREE.PlaneGeometry(
-        100,
-        100
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0x10151d,
-        roughness: 0.9
-      })
-
-    );
-
-  ground.rotation.x =
-    -Math.PI / 2;
-
-  ground.receiveShadow =
-    true;
-
-  scene.add(ground);
-
-  /* ROADS */
-
-  createRoad(
-    0,
-    0,
-    5,
-    100
-  );
-
-  createRoad(
-    0,
-    0,
-    100,
-    5
-  );
-
-  /* BUILDINGS */
-
-  createBuilding(
-    "hq",
-    -10,
-    -8,
-    5,
-    9,
-    0x173a5e
-  );
-
-  createBuilding(
-    "bank",
-    9,
-    -8,
-    5,
-    7,
-    0x254d3c
-  );
-
-  createBuilding(
-    "intelligence",
-    -10,
-    9,
-    5,
-    8,
-    0x422d58
-  );
-
-  createBuilding(
-    "market",
-    9,
-    9,
-    5,
-    6,
-    0x6a4825
-  );
-
+  createGround();
+  createRoads();
+  createBuildings();
   createPlayer();
 
-  window.addEventListener(
-    "resize",
-    resize3D
-  );
+  raycaster = new THREE.Raycaster();
+  mouse = new THREE.Vector2();
 
-  renderer.domElement.addEventListener(
-    "pointerdown",
-    handleSceneClick
-  );
+  canvas.addEventListener("pointerdown", onCanvasPointer);
+
+  window.addEventListener("resize", onResize);
 
   animate();
 }
 
-/* =========================
-   ROAD
-========================= */
+function createGround() {
+  const geometry = new THREE.PlaneGeometry(120, 120);
 
-function createRoad(
-  x,
-  z,
-  width,
-  depth
-) {
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x101827,
+    roughness: 0.9
+  });
 
-  const road =
-    new THREE.Mesh(
+  const ground = new THREE.Mesh(geometry, material);
 
-      new THREE.BoxGeometry(
-        width,
-        0.05,
-        depth
-      ),
+  ground.rotation.x = -Math.PI / 2;
+  ground.receiveShadow = true;
 
-      new THREE.MeshStandardMaterial({
-        color: 0x181c22,
-        roughness: 1
-      })
-
-    );
-
-  road.position.set(
-    x,
-    0.025,
-    z
-  );
-
-  scene.add(road);
+  scene.add(ground);
 }
 
-/* =========================
-   BUILDING
-========================= */
+function createRoads() {
+  const material = new THREE.MeshStandardMaterial({
+    color: 0x202735,
+    roughness: 0.8
+  });
 
-function createBuilding(
-  type,
-  x,
-  z,
-  width,
-  height,
-  color
-) {
+  const horizontal = new THREE.Mesh(
+    new THREE.BoxGeometry(100, 0.15, 10),
+    material
+  );
 
-  const building =
-    new THREE.Mesh(
+  horizontal.position.y = 0.05;
 
-      new THREE.BoxGeometry(
-        width,
-        height,
-        width
-      ),
+  scene.add(horizontal);
 
-      new THREE.MeshStandardMaterial({
-        color,
-        roughness: 0.55,
-        metalness: 0.25
-      })
+  const vertical = new THREE.Mesh(
+    new THREE.BoxGeometry(10, 0.15, 100),
+    material
+  );
 
-    );
+  vertical.position.y = 0.06;
+
+  scene.add(vertical);
+}
+
+function createBuildings() {
+  createBuilding(
+    "hq",
+    -20,
+    -18,
+    10,
+    14,
+    0x304c78
+  );
+
+  createBuilding(
+    "bank",
+    18,
+    -18,
+    12,
+    16,
+    0x405c65
+  );
+
+  createBuilding(
+    "intelligence",
+    -20,
+    18,
+    12,
+    15,
+    0x443a70
+  );
+
+  createBuilding(
+    "market",
+    18,
+    18,
+    13,
+    11,
+    0x68513a
+  );
+}
+
+function createBuilding(type, x, z, width, height, color) {
+  const geometry = new THREE.BoxGeometry(
+    width,
+    height,
+    width
+  );
+
+  const material = new THREE.MeshStandardMaterial({
+    color,
+    roughness: 0.65,
+    metalness: 0.15
+  });
+
+  const building = new THREE.Mesh(
+    geometry,
+    material
+  );
 
   building.position.set(
     x,
@@ -703,11 +1652,8 @@ function createBuilding(
     z
   );
 
-  building.castShadow =
-    true;
-
-  building.receiveShadow =
-    true;
+  building.castShadow = true;
+  building.receiveShadow = true;
 
   building.userData = {
     type,
@@ -715,987 +1661,231 @@ function createBuilding(
   };
 
   scene.add(building);
-
   buildings.push(building);
 
-  /* ROOF */
+  createBuildingRoof(building, width, height);
+}
 
-  const roof =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        width + 0.4,
-        0.3,
-        width + 0.4
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0x080b11,
-        metalness: 0.5
-      })
-
-    );
+function createBuildingRoof(building, width, height) {
+  const roof = new THREE.Mesh(
+    new THREE.BoxGeometry(
+      width + 0.5,
+      0.5,
+      width + 0.5
+    ),
+    new THREE.MeshStandardMaterial({
+      color: 0x111827
+    })
+  );
 
   roof.position.set(
-    x,
-    height + 0.15,
-    z
+    building.position.x,
+    height + 0.25,
+    building.position.z
   );
 
-  roof.userData = {
-    type,
-    interactive: true
-  };
+  roof.userData = building.userData;
 
   scene.add(roof);
-
-  buildings.push(roof);
-
-  /* WINDOWS */
-
-  for (
-    let y = 1.5;
-    y < height - 0.5;
-    y += 1.5
-  ) {
-
-    createWindow(
-      x,
-      y,
-      z - width / 2 - 0.04
-    );
-
-    createWindow(
-      x,
-      y,
-      z + width / 2 + 0.04
-    );
-  }
 }
-
-function createWindow(
-  x,
-  y,
-  z
-) {
-
-  const windowMesh =
-    new THREE.Mesh(
-
-      new THREE.BoxGeometry(
-        0.65,
-        0.55,
-        0.08
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0xd9c77a,
-        emissive: 0x4b3f14,
-        emissiveIntensity: 0.8
-      })
-
-    );
-
-  windowMesh.position.set(
-    x,
-    y,
-    z
-  );
-
-  scene.add(windowMesh);
-}
-
-/* =========================
-   PLAYER
-========================= */
 
 function createPlayer() {
-
-  player =
-    new THREE.Group();
-
-  const body =
-    new THREE.Mesh(
-
-      new THREE.CapsuleGeometry(
-        0.45,
-        0.8,
-        6,
-        12
-      ),
-
-      new THREE.MeshStandardMaterial({
-        color: 0xeeeeee,
-        roughness: 0.4
-      })
-
-    );
-
-  body.castShadow =
-    true;
-
-  player.add(body);
-
-  const light =
-    new THREE.PointLight(
-      0x7ab8ff,
-      2,
-      8
-    );
-
-  light.position.y =
-    1.5;
-
-  player.add(light);
-
-  player.position.set(
-    0,
-    0.9,
-    0
+  const body = new THREE.Mesh(
+    new THREE.CapsuleGeometry(0.8, 1.5, 8, 16),
+    new THREE.MeshStandardMaterial({
+      color: 0x42a5f5,
+      roughness: 0.5
+    })
   );
 
-  scene.add(player);
+  body.position.set(0, 1.5, 0);
+  body.castShadow = true;
+
+  scene.add(body);
+
+  player = body;
 }
 
-/* =========================
-   RESIZE
-========================= */
+function onCanvasPointer(event) {
+  if (!raycaster || !camera || !renderer) return;
 
-function resize3D() {
+  const rect = renderer.domElement.getBoundingClientRect();
 
-  if (
-    !renderer ||
-    !camera
-  ) {
-    return;
+  mouse.x =
+    ((event.clientX - rect.left) / rect.width) * 2 - 1;
+
+  mouse.y =
+    -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+
+  const intersects = raycaster.intersectObjects(
+    buildings,
+    false
+  );
+
+  if (!intersects.length) return;
+
+  const building = intersects[0].object;
+
+  if (building.userData?.interactive) {
+    openBuilding(building.userData.type);
+  }
+}
+
+function movePlayer() {
+  if (!player) return;
+
+  const speed = 0.18;
+
+  let moved = false;
+
+  if (keys.w || keys.arrowup) {
+    player.position.z -= speed;
+    moved = true;
   }
 
-  const container =
-    $("game-container");
+  if (keys.s || keys.arrowdown) {
+    player.position.z += speed;
+    moved = true;
+  }
 
-  const width =
-    container?.clientWidth ||
-    window.innerWidth;
+  if (keys.a || keys.arrowleft) {
+    player.position.x -= speed;
+    moved = true;
+  }
 
-  const height =
-    container?.clientHeight ||
-    window.innerHeight;
+  if (keys.d || keys.arrowright) {
+    player.position.x += speed;
+    moved = true;
+  }
+
+  player.position.x = clamp(
+    player.position.x,
+    -48,
+    48
+  );
+
+  player.position.z = clamp(
+    player.position.z,
+    -48,
+    48
+  );
+
+  if (moved) {
+    state.energy = clamp(
+      state.energy - 0.002,
+      0,
+      100
+    );
+
+    updateHUD();
+  }
+}
+
+function updateCamera() {
+  if (!player || !camera) return;
+
+  const targetX = player.position.x + 22;
+  const targetY = player.position.y + 20;
+  const targetZ = player.position.z + 25;
+
+  camera.position.lerp(
+    new THREE.Vector3(
+      targetX,
+      targetY,
+      targetZ
+    ),
+    0.03
+  );
+
+  camera.lookAt(player.position);
+}
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  movePlayer();
+  updateCamera();
+
+  if (renderer && scene && camera) {
+    renderer.render(scene, camera);
+  }
+}
+
+function onResize() {
+  if (!camera || !renderer) return;
 
   camera.aspect =
-    width / height;
+    window.innerWidth / window.innerHeight;
 
   camera.updateProjectionMatrix();
 
   renderer.setSize(
-    width,
-    height
+    window.innerWidth,
+    window.innerHeight
   );
 }
 
-/* =========================
-   BUILDING CLICK
-========================= */
-
-function handleSceneClick(
-  event
-) {
-
-  if (
-    !camera ||
-    !renderer
-  ) {
-    return;
-  }
-
-  const rect =
-    renderer.domElement
-      .getBoundingClientRect();
-
-  const mouse =
-    new THREE.Vector2();
-
-  mouse.x =
-    (
-      (event.clientX -
-        rect.left) /
-      rect.width
-    ) * 2 - 1;
-
-  mouse.y =
-    -(
-      (event.clientY -
-        rect.top) /
-      rect.height
-    ) * 2 + 1;
-
-  const raycaster =
-    new THREE.Raycaster();
-
-  raycaster.setFromCamera(
-    mouse,
-    camera
-  );
-
-  const hits =
-    raycaster.intersectObjects(
-      buildings,
-      false
-    );
-
-  if (!hits.length) {
-    return;
-  }
-
-  const type =
-    hits[0].object.userData.type;
-
-  if (type) {
-    openBuilding(type);
-  }
-}
-
-/* =========================
-   BUILDING ENTRY
-========================= */
-
-function openBuilding(
-  type
-) {
-
-  state.selectedBuilding =
-    type;
-
-  const title =
-    $("panel-title");
-
-  const text =
-    $("panel-text");
-
-  const panel =
-    $("action-panel");
-
-  if (!panel) {
-    return;
-  }
-
-  const titleKey = {
-
-    hq: "hq",
-    bank: "bank",
-    intelligence: "intelligence",
-    market: "market"
-
-  }[type];
-
-  const textKey = {
-
-    hq: "hqText",
-    bank: "bankText",
-    intelligence: "intelligenceText",
-    market: "marketText"
-
-  }[type];
-
-  if (title) {
-    title.textContent =
-      t(titleKey);
-  }
-
-  if (text) {
-    text.textContent =
-      t(textKey);
-  }
-
-  panel.classList.remove(
-    "hidden"
-  );
-
-  updateBuildingAction(
-    type
-  );
-}
-
-/* =========================
-   BUILDING ACTION
-========================= */
-
-function updateBuildingAction(
-  type
-) {
-
-  const operationButton =
-    $("operation-button");
-
-  if (!operationButton) {
-    return;
-  }
-
-  if (type === "hq") {
-
-    operationButton.innerHTML =
-      `⚡ ${t("operations")}`;
-
-    operationButton.onclick =
-      showOperations;
-
-    return;
-  }
-
-  if (type === "intelligence") {
-
-    operationButton.innerHTML =
-      `🎯 ${t("missions")}`;
-
-    operationButton.onclick =
-      showMissions;
-
-    return;
-  }
-
-  if (type === "bank") {
-
-    operationButton.innerHTML =
-      `🏦 ${t("bank")}`;
-
-    operationButton.onclick =
-      showBank;
-
-    return;
-  }
-
-  if (type === "market") {
-
-    operationButton.innerHTML =
-      `🏪 ${t("marketNav")}`;
-
-    operationButton.onclick =
-      showMarket;
-
-    return;
-  }
-}
-
-/* =========================
-   OPERATIONS
-========================= */
-
-function showOperations() {
-
-  const modal =
-    $("modal");
-
-  const title =
-    $("modal-title");
-
-  const text =
-    $("modal-text");
-
-  if (!modal) {
-    return;
-  }
-
-  if (title) {
-    title.textContent =
-      t("buildingOperations");
-  }
-
-  if (text) {
-
-    text.innerHTML = `
-
-      <strong>
-        ${t("operationOne")}
-      </strong>
-
-      <br><br>
-
-      ${t("operationOneText")}
-
-      <br><br>
-
-      ${t("cost")}: 500 NEX
-
-      <br>
-
-      ${t("reward")}: 1,500 NEX + 50 XP
-
-      <br>
-
-      ${t("risk")}: ${t("low")}
-
-      <br><br>
-
-      <button
-        id="execute-operation"
-        style="
-          width:100%;
-          padding:12px;
-          border:0;
-          border-radius:12px;
-          font-weight:800;
-          cursor:pointer;
-        "
-      >
-        ⚡ ${t("execute")}
-      </button>
-
-    `;
-
-    setTimeout(() => {
-
-      const button =
-        $("execute-operation");
-
-      if (button) {
-
-        button.onclick =
-          performOperation;
-
-      }
-
-    }, 0);
-  }
-
-  modal.classList.remove(
-    "hidden"
-  );
-}
-
-/* =========================
-   OPERATION RESULT
-========================= */
-
-function performOperation() {
-
-  const cost =
-    500;
-
-  const reward =
-    1500;
-
-  const xpReward =
-    50;
-
-  if (
-    state.energy < 10
-  ) {
-
-    showMessage(
-      t("energyEmpty")
-    );
-
-    return;
-  }
-
-  if (
-    state.nex < cost
-  ) {
-
-    showMessage(
-      t("nexEmpty")
-    );
-
-    return;
-  }
-
-  state.nex -= cost;
-
-  state.energy -= 10;
-
-  const success =
-    Math.random() < 0.85;
-
-  if (success) {
-
-    state.nex += reward;
-
-    state.xp += xpReward;
-
-    state.cityValue +=
-      100;
-
-    checkLevel();
-
-    saveState();
-
-    updateHUD();
-
-    showMessage(
-      t("operationSuccess")
-    );
-
-  } else {
-
-    state.xp += 10;
-
-    checkLevel();
-
-    saveState();
-
-    updateHUD();
-
-    showMessage(
-      t("operationFailed")
-    );
-  }
-}
-
-/* =========================
-   OTHER BUILDINGS
-========================= */
-
-function showMissions() {
-
-  showMessage(
-    `${t("missions")}\n\n${t("comingSoon")}`
-  );
-}
-
-function showBank() {
-
-  showMessage(
-    `${t("bank")}\n\n${t("comingSoon")}`
-  );
-}
-
-function showMarket() {
-
-  showMessage(
-    `${t("marketNav")}\n\n${t("comingSoon")}`
-  );
-}
-
-/* =========================
-   MOVEMENT
-========================= */
-
-function movePlayer(
-  dx,
-  dz
-) {
-
-  if (!player) {
-    return;
-  }
-
-  if (state.energy <= 0) {
-
-    showMessage(
-      t("energyEmpty")
-    );
-
-    return;
-  }
-
-  const speed =
-    0.6;
-
-  player.position.x +=
-    dx * speed;
-
-  player.position.z +=
-    dz * speed;
-
-  player.position.x =
-    THREE.MathUtils.clamp(
-      player.position.x,
-      -18,
-      18
-    );
-
-  player.position.z =
-    THREE.MathUtils.clamp(
-      player.position.z,
-      -18,
-      18
-    );
-
-  state.energy =
-    Math.max(
-      0,
-      state.energy - 1
-    );
-
-  saveState();
-
-  updateHUD();
-}
-
-function setupMovement() {
-
-  const directions = {
-
-    up: [0, -1],
-
-    down: [0, 1],
-
-    left: [-1, 0],
-
-    right: [1, 0]
-
-  };
-
-  Object.entries(
-    directions
-  ).forEach(
-    ([id, direction]) => {
-
-      const button =
-        $(`move-${id}`);
-
-      if (!button) {
-        return;
-      }
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          movePlayer(
-            direction[0],
-            direction[1]
-          );
-
-        }
-      );
-    }
-  );
-
-  window.addEventListener(
-    "keydown",
-    (event) => {
-
-      if (
-        event.key ===
-          "ArrowUp" ||
-        event.key === "w"
-      ) {
-        movePlayer(0, -1);
-      }
-
-      if (
-        event.key ===
-          "ArrowDown" ||
-        event.key === "s"
-      ) {
-        movePlayer(0, 1);
-      }
-
-      if (
-        event.key ===
-          "ArrowLeft" ||
-        event.key === "a"
-      ) {
-        movePlayer(-1, 0);
-      }
-
-      if (
-        event.key ===
-          "ArrowRight" ||
-        event.key === "d"
-      ) {
-        movePlayer(1, 0);
-      }
-
-    }
-  );
-}
-
-/* =========================
-   NAVIGATION
-========================= */
-
-function setupNavigation() {
-
-  document
-    .querySelectorAll("[data-nav]")
-    .forEach((button) => {
-
-      button.addEventListener(
-        "click",
-        () => {
-
-          openNavigation(
-            button.dataset.nav
-          );
-
-        }
-      );
-
-    });
-}
-
-function openNavigation(
-  section
-) {
-
-  const modal =
-    $("modal");
-
-  const title =
-    $("modal-title");
-
-  const text =
-    $("modal-text");
-
-  if (!modal) {
-    return;
-  }
-
-  const names = {
-
-    operations:
-      "operations",
-
-    missions:
-      "missions",
-
-    market:
-      "marketNav",
-
-    ranking:
-      "ranking",
-
-    profile:
-      "profile"
-
-  };
-
-  if (title) {
-
-    title.textContent =
-      t(
-        names[section] ||
-        section
-      );
-
-  }
-
-  if (text) {
-
-    text.textContent =
-      t("comingSoon");
-
-  }
-
-  modal.classList.remove(
-    "hidden"
-  );
-}
-
-/* =========================
-   MODALS
-========================= */
-
-function showMessage(
-  message
-) {
-
-  const modal =
-    $("modal");
-
-  const title =
-    $("modal-title");
-
-  const text =
-    $("modal-text");
-
-  if (!modal) {
-    return;
-  }
-
-  if (title) {
-    title.textContent =
-      "NEXUS";
-  }
-
-  if (text) {
-    text.textContent =
-      message;
-  }
-
-  modal.classList.remove(
-    "hidden"
-  );
-}
-
-function setupModals() {
-
-  const closeModal =
-    $("close-modal");
-
-  if (closeModal) {
-
-    closeModal.onclick =
-      () => {
-
-        $("modal")
-          ?.classList
-          .add("hidden");
-
-      };
-
-  }
-
-  const closePanel =
-    $("close-panel");
-
-  if (closePanel) {
-
-    closePanel.onclick =
-      () => {
-
-        $("action-panel")
-          ?.classList
-          .add("hidden");
-
-      };
-
-  }
-}
-
-/* =========================
+/* =========================================================
    DAILY REWARD
-========================= */
+   ========================================================= */
 
 function checkDailyReward() {
+  const today = new Date()
+    .toISOString()
+    .slice(0, 10);
 
-  const today =
-    new Date()
-      .toISOString()
-      .slice(0, 10);
-
-  const last =
-    localStorage.getItem(
-      "nexus_last_daily_reward"
-    );
-
-  if (last !== today) {
-
-    state.nex +=
-      1000;
-
-    localStorage.setItem(
-      "nexus_last_daily_reward",
-      today
-    );
+  if (state.dailyClaimed !== today) {
+    state.dailyClaimed = today;
+    state.nex += 1000;
 
     saveState();
-
     updateHUD();
+
+    setTimeout(() => {
+      showMessage(`🎁 ${t("dailyReward")}`);
+    }, 1200);
   }
 }
 
-/* =========================
-   LEVEL
-========================= */
-
-function checkLevel() {
-
-  const requiredXP =
-    state.level * 500;
-
-  if (
-    state.xp >= requiredXP
-  ) {
-
-    state.xp -=
-      requiredXP;
-
-    state.level +=
-      1;
-
-    state.cityLevel +=
-      1;
-
-    state.cityValue +=
-      500;
-  }
-}
-
-/* =========================
-   ANIMATION
-========================= */
-
-function animate() {
-
-  requestAnimationFrame(
-    animate
-  );
-
-  if (controls) {
-    controls.update();
-  }
-
-  if (player) {
-    player.rotation.y +=
-      0.005;
-  }
-
-  if (
-    renderer &&
-    scene &&
-    camera
-  ) {
-
-    renderer.render(
-      scene,
-      camera
-    );
-
-  }
-}
-
-/* =========================
+/* =========================================================
    START
-========================= */
+   ========================================================= */
 
 function startGame() {
-
-  setupMovement();
-
-  setupNavigation();
-
   setupModals();
+  setupNavigation();
+  setupMovement();
 
   updateInterface();
 
   if (!state.language) {
+    const languageScreen = $("language-screen");
 
-    $("language-screen")
-      ?.classList
-      .remove("hidden");
+    if (languageScreen) {
+      languageScreen.style.display = "flex";
+    }
 
+    const game = $("game-container");
+
+    if (game) {
+      game.style.display = "none";
+    }
+  } else {
+    setLanguage(state.language);
   }
 
   checkDailyReward();
 
   init3D();
-
-  setTimeout(
-    () => {
-
-      $("loading")
-        ?.classList
-        .add("hidden");
-
-    },
-    1200
-  );
 }
 
-if (
-  document.readyState ===
-  "loading"
-) {
-
+if (document.readyState === "loading") {
   document.addEventListener(
     "DOMContentLoaded",
     startGame
   );
-
 } else {
-
   startGame();
-
 }
